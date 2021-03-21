@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <MaxCpuCount>4</MaxCpuCount>
+    <ResultsDirectory>.\TestResults</ResultsDirectory>
+    <TargetPlatform>x86</TargetPlatform>
+  </RunConfiguration>
+
+  <TestRunParameters>
+    <!--Environment-->
+    <Parameter name="FunctionalTest:Environment" value="Local" />
+    <Parameter name="FunctionalTest:Endpoint" value="https://unified-redis-platform-api-prod.azurefd.net/" />
+    <Parameter name="FunctionalTest:TokenUri" value="api/token"/>
+    <Parameter name="FunctionalTest:ConfigUri" value="api/configurations"/>
+    
+    <!--Clusters-->
+    <Parameter name="FunctionalTest:Clusters" value="PS-PreProd-01,PS-Prod-01" />
+    <Parameter name="FunctionalTest:PS-PreProd-01:Apps" value="FXP-Service-SIT,FXP-Service,FXP-ConfigSvc-SIT,FXP-ConfigSvc,Resource-Time-Away,Global-Resource-Management-SIT,Global-Resource-Management-Aurora-SIT,Global-Resource-Management" />
+    <Parameter name="FunctionalTest:PS-Prod-01:Apps" value="FXP-Service,FXP-ConfigSvc,FXP-AdminTool,Resource-Time-Away,Global-Resource-Management" />
+    <Parameter name="FunctionalTest:Regions" value="eastus,westus" />
+    
+    <!--FXP-Service-->
+    <Parameter name="FunctionalTest:PS-PreProd-01:FXP-Service-SIT:Password" value="" />
+    <Parameter name="FunctionalTest:PS-PreProd-01:FXP-Service:Password" value="" />
+    <Parameter name="FunctionalTest:PS-Prod-01:FXP-Service:Password" value="" />
+
+    <!--Config Service-->
+    <Parameter name="FunctionalTest:PS-PreProd-01:FXP-ConfigSvc-SIT:Password" value="" />
+    <Parameter name="FunctionalTest:PS-PreProd-01:FXP-ConfigSvc:Password" value="" />
+    <Parameter name="FunctionalTest:PS-Prod-01:FXP-ConfigSvc:Password" value="" />
+    
+    <!--Admin Tool-->
+    <Parameter name="FunctionalTest:PS-Prod-01:FXP-AdminTool:Password" value="" />
+    
+    <!--Resource Time Away-->
+    <Parameter name="FunctionalTest:PS-PreProd-01:Resource-Time-Away:Password" value="" />
+    <Parameter name="FunctionalTest:PS-Prod-01:Resource-Time-Away:Password" value="" />
+
+    <!--Global Resource Management-->
+    <Parameter name="FunctionalTest:PS-PreProd-01:Global-Resource-Management-SIT:Password" value="" />
+    <Parameter name="FunctionalTest:PS-PreProd-01:Global-Resource-Management-Aurora-SIT:Password" value="" />
+    <Parameter name="FunctionalTest:PS-PreProd-01:Global-Resource-Management:Password" value="" />
+    <Parameter name="FunctionalTest:PS-Prod-01:Global-Resource-Management:Password" value="" />
+    
+    
+  </TestRunParameters>
+</RunSettings>

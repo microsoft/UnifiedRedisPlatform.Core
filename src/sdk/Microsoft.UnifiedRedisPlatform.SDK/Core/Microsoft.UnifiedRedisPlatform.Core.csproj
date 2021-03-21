@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Version>0.0.2</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Authors>Pratik Bhattacharya</Authors>
+    <Company>Microsoft</Company>
+    <Product>Unified Redis Platform</Product>
+    <Description>Lighweight library to connect to a common Redis Cache from multiple applications</Description>
+    <PackageReleaseNotes>Added dependencies</PackageReleaseNotes>
+    <PackageId>Microsoft.UnifiedRedisPlatform.Core</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+  </ItemGroup>
+
+</Project>

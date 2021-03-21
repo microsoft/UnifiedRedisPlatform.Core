@@ -1,0 +1,2 @@
+nuget pack Microsoft.UnifiedRedisPlatform.Core.nuspec
+nuget.exe push -Source "PS" -ApiKey AzureDevOps Microsoft.UnifiedRedisPlatform.Core.x.x.x.nupkg

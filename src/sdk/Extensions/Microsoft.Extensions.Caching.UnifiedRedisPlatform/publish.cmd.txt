@@ -1,0 +1,4 @@
+nuget pack Microsoft.Extensions.Caching.UnifiedRedisPlatform.nuspec
+nuget.exe push -Source "PS" -ApiKey AzureDevOps Microsoft.Extensions.Caching.UnifiedRedisPlatform.x.x.x.nupkg
+
+"PS" -> Name for PS source(https://pkgs.dev.azure.com/MicrosoftIT/_packaging/ProfessionalServices/nuget/v3/index.json)

@@ -1,14 +1,20 @@
-# Project
+# Unified Refis Platform (URP)
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+This platform allows multiple application to re-use a single or a cluster of Redis Caches. The platform provides proper isolation required by multiple apps to operate (get/edit/delete/update cached objects) on a single cluster without interfering (overriding other application's keys) with each other.
 
-As the maintainer of this project, please make a few updates:
+Capabilities:
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+1.	Consolidate multiple Azure Cache for Redis instances to a single cluster
+2.	Automatic key name-spacing for providing isolation between multiple applications
+3.	Disaster Recovery by keeping Azure Redis Cache in multiple regions in a single cluster
+4.	Multiple read-regions
+5.	Geo-replication of data (add/delete/update) across multiple regions
+6.	Support for all operations available in StackExchange.Redis library. All methods and data types from StackExchange.Redis can be re-used without any code change.
+7.	Support for auto-retires and timeouts in case of errors
+8.	Automatic lazy and singleton connection for preventing connection exhaustion issues
+9.	Secure connection using application specific private Keys
+10.	Telemetry support for key usage, performance reports and failures
+11.	Management console for managing keys from backend
 
 ## Contributing
 

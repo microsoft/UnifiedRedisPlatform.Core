@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.UnifiedRedisPlatform.Core</id>
+    <version>1.2.0-rc-1.0</version>
+    <title>Microsoft.UnifiedRedisPlatform.Core</title>
+    <authors>Pratik Bhattacharya</authors>
+    <owners>Microsoft</owners>
+    <projectUrl>https://dev.azure.com/MicrosoftIT/OneITVSO/_workitems/edit/4288461</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Lighweight library to connect to a common Redis Cache from multiple applications</description>
+    <releaseNotes>Added methods for automatically adding absolute and sliding expiring keys</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>Unified Redis Platform URP</tags>
+    <dependencies>
+      <group targetFramework="netstandard2.0">
+        <dependency id="Newtonsoft.Json" version="12.0.2" />
+        <dependency id="StackExchange.Redis" version="2.0.601" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\netstandard2.0\Microsoft.UnifiedRedisPlatform.Core.dll" target="lib\netstandard2.0"/>
+  </files>
+</package>

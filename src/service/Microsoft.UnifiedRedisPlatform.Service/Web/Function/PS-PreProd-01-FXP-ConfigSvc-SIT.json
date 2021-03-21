@@ -1,0 +1,27 @@
+{
+    "AppName": "FXP-ConfigSvc-SIT",
+    "SupportContact": "fxpswe@microsoft.com",
+    "RedisCachePrefix": "fcsit",
+    "AppSecretLocation": "PS-PreProd-01-FXP-ConfigSvc-SIT-Secret",
+    "ConnectionPreference": {
+        "ConnectionRetryProtocol": {
+            "MaxRetryCount": 50,
+            "MinBackoffIntervalInMs": 1000,
+            "MaxBackoffIntervalInMs": 15000,
+            "TimeoutInMs": 15000,
+            "HardTimeoutEnabled": false
+        },
+        "OperationalRetryProtocol": {
+            "MaxRetryCount": 30,
+            "MinBackoffIntervalInMs": 1000,
+            "MaxBackoffIntervalInMs": 5000,
+            "TimeoutInMs": 2000,
+            "HardTimeoutEnabled": true
+        }
+    },
+    "DiagnosticSettings": {
+        "Enabled": "true",
+        "LoggingStrategy": "CacheAsideLogging",
+        "LogKey": "URP:Logs"
+    }
+}
