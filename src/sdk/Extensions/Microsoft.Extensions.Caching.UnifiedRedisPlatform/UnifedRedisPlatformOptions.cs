@@ -31,7 +31,7 @@ namespace Microsoft.Extensions.Caching.UnifiedRedisPlatform
         /// <summary>
         /// Configuration options for connecting to Unified Redis Cluster
         /// </summary>
-        public UnifiedConfigurationOptions ConfigurationOptions { get; set; }
+        public UnifiedConfigurationServerOptions ConfigurationOptions { get; set; }
 
         public UnifedRedisPlatformOptions Value => this;
     }

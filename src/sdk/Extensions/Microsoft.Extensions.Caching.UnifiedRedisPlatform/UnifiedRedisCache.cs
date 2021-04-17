@@ -21,8 +21,8 @@ namespace Microsoft.Extensions.Caching.UnifiedRedisPlatform
 
 
         private IUnifiedDatabase Connect(UnifedRedisPlatformOptions options)
-        {
-            IConnectionMultiplexer connectionMux;
+        {   
+            IUnifiedConnectionMultiplexer connectionMux;
             if (options.ConfigurationOptions != null)
             {
                 connectionMux = UnifiedConnectionMultiplexer.Connect(options.ConfigurationOptions);

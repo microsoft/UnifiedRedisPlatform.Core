@@ -29,7 +29,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
         }
 
         private List<RedisKey> GetKeys(IConnectionMultiplexer mux, string pattern = "")
-        {
+        {   
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var endpoints = mux.GetEndPoints();
