@@ -80,7 +80,7 @@ namespace TestConsole461.SDK
                     var isDiagnosticsEnabled = Console.ReadKey().KeyChar.ToString().ToLower().Equals("y");
                     Console.WriteLine();
 
-                    var configuration = new UnifiedConfigurationOptions()
+                    var configuration = new UnifiedConfigurationServerOptions()
                     {
                         ClusterName = _clusterName,
                         AppName = _appName,

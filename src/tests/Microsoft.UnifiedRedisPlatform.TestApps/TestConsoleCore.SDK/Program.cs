@@ -75,7 +75,7 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
                     var isHardTimeoutEnabled = Console.ReadKey().KeyChar.ToString().ToLower().Equals("y");
                     Console.WriteLine();
 
-                    var configuration = new UnifiedConfigurationOptions()
+                    var configuration = new UnifiedConfigurationServerOptions()
                     {
                         ClusterName = _clusterName,
                         AppName = _appName,
