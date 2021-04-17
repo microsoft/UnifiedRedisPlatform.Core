@@ -31,7 +31,7 @@ jobs:
         command: 'build'
         projects: 'src/sdk/**/*.csproj'
 
-- job: Build-Service
+- job: Build_Service
   displayName: Build Service
   pool:
     vmImage: ubuntu-latest
