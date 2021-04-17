@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-code-sdk:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore **/Microsoft.UnifiedRedisPlatform.SDK.sln
+    - name: Build
+      run: dotnet build **/Microsoft.UnifiedRedisPlatform.SDK.sln --no-restore
+    - name: Test
+      run: dotnet test **/Microsoft.UnifiedRedisPlatform.SDK.sln --no-build --verbosity normal
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore **/Microsoft.UnifiedRedisPlatform.TestApps.sln
+    - name: Build
+      run: dotnet build **/Microsoft.UnifiedRedisPlatform.TestApps.sln --no-restore
+    - name: Test
+      run: dotnet test **/Microsoft.UnifiedRedisPlatform.TestApps.sln --no-build --verbosity normal
