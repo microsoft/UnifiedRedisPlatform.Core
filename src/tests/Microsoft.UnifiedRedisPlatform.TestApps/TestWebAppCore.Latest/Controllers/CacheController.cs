@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.UnifiedRedisPlatform.TestWebAppCore.Latest;
-using System;
+﻿using System;
+using System.Linq;
 using System.Text;
+using StackExchange.Redis;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.UnifiedRedisPlatform;
+using Microsoft.UnifiedRedisPlatform.TestWebAppCore.Latest;
 
 namespace TestWebAppCore.Latest.Controllers
 {
@@ -11,9 +15,9 @@ namespace TestWebAppCore.Latest.Controllers
     [Route("api/cache")]
     public class CacheController : ControllerBase
     {
-        private readonly IDistributedCache _cache;
+        private readonly IDistributedUnifiedRedisCache _cache;
 
-        public CacheController(IDistributedCache cache)
+        public CacheController(IDistributedUnifiedRedisCache cache)
         {
             _cache = cache;
         }
@@ -41,6 +45,16 @@ namespace TestWebAppCore.Latest.Controllers
             if (value == null)
                 return new NotFoundResult();
             return new OkObjectResult(Encoding.ASCII.GetString(value));
+        }
+
+        [HttpGet]
+        [Route("keys/{pattern}/search")]
+        public async Task<IActionResult> Search([FromRoute] string pattern)
+        {
+            IEnumerable<RedisKey> keys = await _cache.GetKeys(pattern);
+            if (keys == null || !keys.Any())
+                return new NotFoundResult();
+            return new OkObjectResult(keys.Select(key => key.ToString()));
         }
     }
 }

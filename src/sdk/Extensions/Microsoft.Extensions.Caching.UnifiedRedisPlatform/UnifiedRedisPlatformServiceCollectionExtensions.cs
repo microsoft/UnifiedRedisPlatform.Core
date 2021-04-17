@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.Caching.UnifiedRedisPlatform
             services.AddOptions();
             services.Configure(setupAction);
             services.AddSingleton<IDistributedCache, UnifiedRedisCache>();
+            services.AddSingleton<IDistributedUnifiedRedisCache, UnifiedRedisCache>();
 
             return services;
         }

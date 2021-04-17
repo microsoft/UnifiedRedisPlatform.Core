@@ -6,9 +6,12 @@
     <Company>Microsoft</Company>
     <Product>Unified Redis Platform</Product>
     <Description>Distributed cache implementation of Microsoft.Extensions.Caching.Distributed.IDistributedCache using Unified Redis Platform</Description>
-    <RepositoryUrl>https://dev.azure.com/MicrosoftIT/OneITVSO/_git/PS-GCM-FExP-FxpTools?path=%2Fsrc%2FUnifiedRedisPlatform%2Fsrc</RepositoryUrl>
-    <RepositoryType>Git</RepositoryType>
-    <PackageProjectUrl>https://aka.ms/urp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/microsoft/UnifiedRedisPlatform.Core.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/microsoft/UnifiedRedisPlatform.Core</PackageProjectUrl>
+    <PackageId>DistributedCache.Extensions.UnifiedRedisPlatform</PackageId>
+    <PackageTags>IDistributedCache redis azure caching distributed_cache azure-cache-for-redus azure-cache aspnetcore-cache urp unifedredisplatform unifiedredisframework</PackageTags>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

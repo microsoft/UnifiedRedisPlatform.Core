@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using StackExchange.Redis;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.UnifiedRedisPlatform.Core;
@@ -8,25 +7,26 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Microsoft.Extensions.Caching.UnifiedRedisPlatform
 {
-    public class UnifiedRedisCache : IDistributedCache
+    public partial class UnifiedRedisCache : IDistributedUnifiedRedisCache
     {
+        private readonly IUnifiedConnectionMultiplexer _connectionMultiplexer;
         private readonly IUnifiedDatabase _database;
 
         public UnifiedRedisCache(IOptions<UnifedRedisPlatformOptions> options)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
-            _database = Connect(options.Value);
+            _connectionMultiplexer = CreateConnection(options.Value);
+            _database = _connectionMultiplexer.GetDatabase() as IUnifiedDatabase;
         }
 
-
-        private IUnifiedDatabase Connect(UnifedRedisPlatformOptions options)
-        {   
+        private IUnifiedConnectionMultiplexer CreateConnection(UnifedRedisPlatformOptions options)
+        {
             IUnifiedConnectionMultiplexer connectionMux;
             if (options.ConfigurationOptions != null)
             {
                 connectionMux = UnifiedConnectionMultiplexer.Connect(options.ConfigurationOptions);
-                return connectionMux.GetDatabase() as IUnifiedDatabase;
+                return connectionMux;
             }
 
             if (string.IsNullOrWhiteSpace(options.Cluster)
@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.Caching.UnifiedRedisPlatform
 
             string preferredLocation = !string.IsNullOrWhiteSpace(options.PreferredLocation) ? options.PreferredLocation : null;
             connectionMux = UnifiedConnectionMultiplexer.Connect(options.Cluster, options.Application, options.AppSecret, preferredLocation: preferredLocation);
-            return connectionMux.GetDatabase() as IUnifiedDatabase;
+            return connectionMux;
         }
 
         public byte[] Get(string key)
