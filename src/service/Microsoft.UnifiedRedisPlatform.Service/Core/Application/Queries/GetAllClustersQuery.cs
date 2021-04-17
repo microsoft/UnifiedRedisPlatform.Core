@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.CQRS;
+using CQRS.Mediatr.Lite;
 using System.Collections.Generic;
 using Microsoft.UnifiedPlatform.Service.Common.Models;
 

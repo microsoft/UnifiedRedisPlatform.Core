@@ -1,7 +1,7 @@
 using System;
 using Autofac;
 using System.Linq;
-using Microsoft.CQRS;
+using CQRS.Mediatr.Lite;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.AspNetCore.Mvc;

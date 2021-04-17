@@ -1,4 +1,4 @@
-﻿using Microsoft.CQRS;
+﻿using CQRS.Mediatr.Lite;
 using System.Threading.Tasks;
 using Microsoft.UnifiedPlatform.Service.Common.Redis;
 using Microsoft.UnifiedPlatform.Service.Common.Configuration;

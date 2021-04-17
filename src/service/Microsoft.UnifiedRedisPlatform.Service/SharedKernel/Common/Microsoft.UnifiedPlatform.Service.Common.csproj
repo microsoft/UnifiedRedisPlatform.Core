@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AppInsights.EnterpriseTelemetry" Version="1.0.0" />
-    <PackageReference Include="AppInsights.EnterpriseTelemetry.AspNetCore.Extension" Version="1.0.1" />
+    <PackageReference Include="AppInsights.EnterpriseTelemetry" Version="1.0.2" />
+    <PackageReference Include="AppInsights.EnterpriseTelemetry.AspNetCore.Extension" Version="1.0.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.4" />

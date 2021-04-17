@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.CQRS;
+using CQRS.Mediatr.Lite;
 using System.Threading.Tasks;
 using AppInsights.EnterpriseTelemetry;
 using System.Collections.Generic;

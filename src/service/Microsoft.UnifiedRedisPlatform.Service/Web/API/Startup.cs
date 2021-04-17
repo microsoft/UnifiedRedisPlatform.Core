@@ -72,7 +72,7 @@ namespace API
             
             services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
             services.AddApplicationInsightsTelemetry(Configuration);
-            services.AddEnterpriseLogger(Configuration);
+            services.AddEnterpriseTelemetry(Configuration);
 
             services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
             services.AddControllers(options =>

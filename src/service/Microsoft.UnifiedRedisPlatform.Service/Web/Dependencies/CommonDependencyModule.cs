@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using System.Linq;
 using Autofac.Core;
-using Microsoft.CQRS;
+using CQRS.Mediatr.Lite;
 using Microsoft.AzureRegion;
 using System.Collections.Generic;
 using Microsoft.UnifiedPlatform.Storage;

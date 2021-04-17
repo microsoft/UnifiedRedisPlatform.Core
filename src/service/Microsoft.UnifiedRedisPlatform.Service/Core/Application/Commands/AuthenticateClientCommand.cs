@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.CQRS;
+using CQRS.Mediatr.Lite;
 
 namespace Microsoft.UnifiedPlatform.Service.Application.Commands
 {

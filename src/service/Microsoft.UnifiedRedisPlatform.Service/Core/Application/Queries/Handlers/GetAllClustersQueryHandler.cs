@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Microsoft.CQRS;
+using CQRS.Mediatr.Lite;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.UnifiedPlatform.Service.Common.Models;

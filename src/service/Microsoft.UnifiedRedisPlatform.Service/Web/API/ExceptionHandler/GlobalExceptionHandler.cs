@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net;
-using AppInsights.EnterpriseTelemetry;
 using Microsoft.AspNetCore.Http;
-using Microsoft.CQRS.Exceptions;
-using AppInsights.EnterpriseTelemetry.Context;
+using CQRS.Mediatr.Lite.Exceptions;
+using AppInsights.EnterpriseTelemetry;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
-using AppInsights.EnterpriseTelemetry.Web.Extension.Middlewares;
+using AppInsights.EnterpriseTelemetry.Context;
 using Microsoft.UnifiedPlatform.Service.Common.AppExceptions;
+using AppInsights.EnterpriseTelemetry.Web.Extension.Middlewares;
 
 namespace Microsoft.UnifiedRedisPlatform.Service.API.ExceptionHandler
 {

@@ -32,7 +32,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Function
 
         public override void Configure(IFunctionsHostBuilder builder)
         {   
-            builder.Services.AddEnterpriseLogger(builder.GetContext().Configuration);
+            builder.Services.AddEnterpriseTelemetry(builder.GetContext().Configuration);
             builder.Services.AddSingleton<ITelemetryInitializer, ResponseCodeTranslationIntitializer>();
             builder.Services.AddSingleton<ITelemetryInitializer, ClientSideErrorInitializer>();
             IContainer applicationContainer = RegisterDependencies(builder.Services, builder.GetContext().Configuration);
