@@ -45,10 +45,10 @@ jobs:
         versionSpec: '5.5.0'
         checkLatest: true
     - task: UseDotNet@2
-      displayName: Use .NET Core 5.0.x
+      displayName: Use .NET Core 3.1.x
       inputs:
         packageType: 'sdk'
-        version: '5.0.x'
+        version: '3.1.x'
     - task: NuGetCommand@2
       displayName: Restore Solution
       inputs:
