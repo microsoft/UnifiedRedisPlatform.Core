@@ -21,7 +21,21 @@ jobs:
       run: dotnet build src/sdk/Microsoft.UnifiedRedisPlatform.SDK.sln --no-restore
     - name: Test
       run: dotnet test src/sdk/Microsoft.UnifiedRedisPlatform.SDK.sln --no-build --verbosity normal
-  build-test:
+  
+  build-service:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Restore dependencies
+      run: dotnet restore src/service/Microsoft.UnifiedRedisPlatform.Service/Microsoft.UnifiedRedisPlatform.Service.sln
+    - name: Build
+      run: dotnet build src/service/Microsoft.UnifiedRedisPlatform.Service/Microsoft.UnifiedRedisPlatform.Service.sln
+      
+  build-test-apps:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -29,9 +43,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore src/tests/Microsoft.UnifiedRedisPlatform.TestApps/Microsoft.UnifiedRedisPlatform.Tests.sln
-    - name: Build
-      run: dotnet build src/tests/Microsoft.UnifiedRedisPlatform.TestApps/Microsoft.UnifiedRedisPlatform.Tests.sln --no-restore
-    - name: Test
-      run: dotnet test src/tests/Microsoft.UnifiedRedisPlatform.TestApps/Microsoft.UnifiedRedisPlatform.Tests.sln --no-build --verbosity normal
+    - name: Restore dependencies (TestConsoleCore.SDK)
+      run: dotnet restore src/tests/Microsoft.UnifiedRedisPlatform.TestApps/TestConsoleCore.SDK/Microsoft.UnifiedRedisPlatform.TestConsoleCore.SDK.csproj
+    - name: Build (TestConsoleCore.SDK)
+      run: dotnet build src/tests/Microsoft.UnifiedRedisPlatform.TestApps/TestConsoleCore.SDK/Microsoft.UnifiedRedisPlatform.TestConsoleCore.SDK.csproj
+    - name: Restore dependencies (TestWebAppCore.SDK)
+      run: dotnet restore src/tests/Microsoft.UnifiedRedisPlatform.TestApps/TestWebAppCore.SDK/Microsoft.UnifiedRedisPlatform.TestWebAppCore.SDK.csproj
+    - name: Build (TestWebAppCore.SDK)
+      run: dotnet build src/tests/Microsoft.UnifiedRedisPlatform.TestApps/TestWebAppCore.SDK/Microsoft.UnifiedRedisPlatform.TestWebAppCore.SDK.csproj
+    
