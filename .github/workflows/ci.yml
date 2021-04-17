@@ -16,11 +16,11 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore **/Microsoft.UnifiedRedisPlatform.SDK.sln
+      run: dotnet restore src/sdk/Microsoft.UnifiedRedisPlatform.SDK.sln
     - name: Build
-      run: dotnet build **/Microsoft.UnifiedRedisPlatform.SDK.sln --no-restore
+      run: dotnet build src/sdk/Microsoft.UnifiedRedisPlatform.SDK.sln --no-restore
     - name: Test
-      run: dotnet test **/Microsoft.UnifiedRedisPlatform.SDK.sln --no-build --verbosity normal
+      run: dotnet test src/sdk/Microsoft.UnifiedRedisPlatform.SDK.sln --no-build --verbosity normal
   build-test:
     runs-on: ubuntu-latest
     steps:
@@ -30,8 +30,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore **/Microsoft.UnifiedRedisPlatform.TestApps.sln
+      run: dotnet restore src/tests/Microsoft.UnifiedRedisPlatform.TestApps/Microsoft.UnifiedRedisPlatform.Tests.sln
     - name: Build
-      run: dotnet build **/Microsoft.UnifiedRedisPlatform.TestApps.sln --no-restore
+      run: dotnet build src/tests/Microsoft.UnifiedRedisPlatform.TestApps/Microsoft.UnifiedRedisPlatform.Tests.sln --no-restore
     - name: Test
-      run: dotnet test **/Microsoft.UnifiedRedisPlatform.TestApps.sln --no-build --verbosity normal
+      run: dotnet test src/tests/Microsoft.UnifiedRedisPlatform.TestApps/Microsoft.UnifiedRedisPlatform.Tests.sln --no-build --verbosity normal

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UnifiedRedisPlatf
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{C847979E-B60C-4E82-8D43-1C672C8139F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Extensions.Caching.UnifiedRedisPlatform", "..\Extensions\Microsoft.Extensions.Caching.UnifiedRedisPlatform\Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj", "{3CEE5F16-E1DD-432A-97F0-13A99DA272FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Extensions.Caching.UnifiedRedisPlatform", "Extensions\Microsoft.Extensions.Caching.UnifiedRedisPlatform\Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj", "{3CEE5F16-E1DD-432A-97F0-13A99DA272FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
