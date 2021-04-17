@@ -1,0 +1,23 @@
+name: Release-Extension-DistributedCache
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install dependencies
+      run: dotnet restore src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj
+    - name: Build
+      run: dotnet build src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj --no-restore
+    - name: Test
+      run: dotnet test src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj --no-restore --verbosity normal
+    - name: Pack
+      run: dotnet src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj
+    - name: Publish
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NuGet_API_Key }} --source https://api.nuget.org/v3/index.json
