@@ -18,6 +18,6 @@ jobs:
     - name: Test
       run: dotnet test src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj --no-restore --verbosity normal
     - name: Pack
-      run: dotnet src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj
+      run: dotnet pack src/sdk/Extensions/Microsoft.Extensions.Caching.UnifiedRedisPlatform/Microsoft.Extensions.Caching.UnifiedRedisPlatform.csproj
     - name: Publish
       run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NuGet_API_Key }} --source https://api.nuget.org/v3/index.json
