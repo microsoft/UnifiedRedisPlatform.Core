@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\sdk\Microsoft.UnifiedRedisPlatform.SDK\Core\Microsoft.UnifiedRedisPlatform.Core.csproj" />
+    <ProjectReference Include="..\..\..\sdk\Core\Microsoft.UnifiedRedisPlatform.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

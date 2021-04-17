@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Pratik Bhattacharya</Authors>
     <Company>Microsoft</Company>
     <Product>Unified Redis Platform</Product>
     <Description>Lighweight library to connect to a common Redis Cache from multiple applications</Description>
-    <PackageReleaseNotes>Intial Release</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored IUnifiedConnectionMultiplexer interface</PackageReleaseNotes>
     <PackageId>UnifiedRedisPlatform</PackageId>
     <RepositoryType>git</RepositoryType>
     <PackageTags>redis; azure; unifed redis platform; unified redis framework; redis cache; azure cache; azure redis cache; azure cost</PackageTags>

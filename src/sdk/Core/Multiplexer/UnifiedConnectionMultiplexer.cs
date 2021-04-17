@@ -8,7 +8,7 @@ using Microsoft.UnifiedRedisPlatform.Core.Constants;
 
 namespace Microsoft.UnifiedRedisPlatform.Core
 {
-    public sealed partial class UnifiedConnectionMultiplexer : IConnectionMultiplexer, IUnifiedConnectionMultiplexer
+    public sealed partial class UnifiedConnectionMultiplexer : IUnifiedConnectionMultiplexer
     {
         public string ClusterName { get; }
         public string AppName { get; }

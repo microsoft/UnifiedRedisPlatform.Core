@@ -8,7 +8,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
     /// <summary>
     /// Represents the abstract multiplexer API for Unified Connections
     /// </summary>
-    public interface IUnifiedConnectionMultiplexer
+    public interface IUnifiedConnectionMultiplexer: IConnectionMultiplexer
     {
         string ClusterName { get; }
         string AppName { get; }
