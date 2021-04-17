@@ -183,18 +183,21 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
                         DeleteKey();
                         break;
                     case 7:
-                        PingContinously();
+                        DeletePattern();
                         break;
                     case 8:
-                        ShowLogs();
+                        PingContinously();
                         break;
                     case 9:
-                        GetGeneicKey();
+                        ShowLogs();
                         break;
                     case 10:
-                        SetKeyWithExpiration();
+                        GetGeneicKey();
                         break;
                     case 11:
+                        SetKeyWithExpiration();
+                        break;
+                    case 12:
                         ResetKeySlidingWindow();
                         break;
 
@@ -247,15 +250,16 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
             Console.WriteLine("   0. Show options");
             Console.WriteLine("   1. Create a key");
             Console.WriteLine("   2. Get value by key name");
-            Console.WriteLine("   3. Get all keys");
+            Console.WriteLine("   3. Search keys");
             Console.WriteLine("   4. Flush cache");
             Console.WriteLine("   5. Flush secondary cache");
             Console.WriteLine("   6. Delete Key");
-            Console.WriteLine("   7. Ping Continous");
-            Console.WriteLine("   8. Show Uncomiited Logs");
-            Console.WriteLine("   9. Advanced - Get generic key (with expiration)");
-            Console.WriteLine("   10. Advanced - Set generic key with expiration");
-            Console.WriteLine("   11. Advanced - Reset sliding window expiration");
+            Console.WriteLine("   7. Delete Key by pattern");
+            Console.WriteLine("   8. Ping Continous");
+            Console.WriteLine("   9. Show Uncomiited Logs");
+            Console.WriteLine("   10. Advanced - Get generic key (with expiration)");
+            Console.WriteLine("   11. Advanced - Set generic key with expiration");
+            Console.WriteLine("   12. Advanced - Reset sliding window expiration");
             Console.WriteLine("   Anything else. Exit App");
             Console.ForegroundColor = ConsoleColor.White;
         }
@@ -314,15 +318,19 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
         {
             try
             {
+                
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Warning: Please be aware of the performace impact of your operation. Press 'e' to exit");
+                Console.WriteLine("Warning: Please be aware of the performace impact of your operation. Press 'e' to exit or any other key to continue");
                 var choice = Console.ReadKey();
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine();
                 if (choice.KeyChar.ToString().ToLower() == "e")
                     return;
 
-                var keys = AsyncMode ? _mux.GetKeysAsync().Result : _mux.GetKeys();
+                Console.WriteLine("Enter search pattern (use * for generic search). Press enter to search for all keys.");
+                string searchPattern = Console.ReadLine();
+
+                var keys = AsyncMode ? _mux.GetKeysAsync(pattern: searchPattern).Result : _mux.GetKeys(pattern: searchPattern);
                 if (!keys.Any())
                     Console.WriteLine("No keys found in cache");
                 else
@@ -393,6 +401,37 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
                     _mux.FlushAsync();
 
                 Console.WriteLine("Cache flushed");
+            }
+            catch (Exception exception)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("There was an error in executing the operation");
+                Console.WriteLine(exception.ToString());
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
+
+        private static void DeletePattern()
+        {
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Warning: Please be aware of the performace impact of your operation. Press 'e' to exit or any other key to continue.");
+                var choice = Console.ReadKey();
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine();
+                if (choice.KeyChar.ToString().ToLower() == "e")
+                    return;
+
+                Console.WriteLine("Enter search pattern (use * for generic search). Press enter to search for all keys.");
+                string searchPattern = Console.ReadLine();
+
+                if (AsyncMode)
+                    _mux.FlushAsync(pattern: searchPattern).Wait();
+                else
+                    _mux.FlushAsync(pattern: searchPattern);
+
+                Console.WriteLine("Keys deleted");
             }
             catch (Exception exception)
             {

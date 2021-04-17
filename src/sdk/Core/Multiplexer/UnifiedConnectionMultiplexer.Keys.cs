@@ -28,8 +28,9 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             return await Task.Run(() => GetKeys(mux, pattern));
         }
 
+#pragma warning disable CS0618 // Checking for 'IsSlave' for backward compatibility with Redis 4 or less
         private List<RedisKey> GetKeys(IConnectionMultiplexer mux, string pattern = "")
-        {   
+        {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var endpoints = mux.GetEndPoints();
@@ -43,7 +44,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                     continue;
 
                 var matchingPattern = _unifiedConfigurations.KeyPrefix + ":" + pattern +
-                    (string.IsNullOrWhiteSpace(pattern) && pattern.EndsWith("*") ? string.Empty : "*");
+                    (!string.IsNullOrWhiteSpace(pattern) && pattern.EndsWith("*") ? string.Empty : "*");
                 var keys = server.Keys(pattern: matchingPattern, pageSize: 1000);
                 if (keys == null || !keys.Any())
                     return new List<RedisKey>();
@@ -53,11 +54,13 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                     stopwatch.ElapsedMilliseconds,
                     new Dictionary<string, string>() { { "Patten", pattern }, { "KeysCount", keys.Count().ToString() } });
 
-                return keys.ToList();
+
+                return keys.Select(key => new RedisKey(key.ToString().Substring(_unifiedConfigurations.KeyPrefix.Length + 1))).ToList();
             }
 
             return new List<RedisKey>();
         }
+#pragma warning restore CS0618 // Checking for 'IsSlave' for backward compatibility with Redis 4 or less
 
         [Obsolete("May cause performance issues. Please avoid using this method.")]
         public List<RedisKey> Flush(string pattern = "", CommandFlags flags = CommandFlags.None)
@@ -68,7 +71,10 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             if (keys == null || !keys.Any())
                 return null;
 
-            keys = keys.Where(key => !key.ToString().Contains(_unifiedConfigurations.DiagnosticSettings.LogKey)).ToList();
+            keys = keys
+                .Where(key => !key.ToString().Contains(_unifiedConfigurations.DiagnosticSettings.LogKey))
+                .Select(key => new RedisKey($"{_unifiedConfigurations.KeyPrefix}:{key}"))
+                .ToList();
 
             var database = _baseConnectionMux.GetDatabase();
             database.KeyDelete(keys.ToArray(), flags);
@@ -96,6 +102,10 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             var keys = await GetKeysAsync(pattern);
             if (keys == null || !keys.Any())
                 return null;
+            keys = keys
+                .Where(key => !key.ToString().Contains(_unifiedConfigurations.DiagnosticSettings.LogKey))
+                .Select(key => new RedisKey($"{_unifiedConfigurations.KeyPrefix}:{key}"))
+                .ToList();
             var database = _baseConnectionMux.GetDatabase();
             await database.KeyDeleteAsync(keys.ToArray(), flags);
             if (!string.IsNullOrWhiteSpace(_unifiedConfigurations.WritePolicy) &&
