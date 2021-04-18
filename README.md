@@ -1,8 +1,10 @@
 # Unified Redis Platform (URP)
 
+### [Official Documentation](https://github.com/microsoft/UnifiedRedisPlatform.Core/wiki/What-is-Unified-Redis-Platform-(URP)%3F)
+
 ## Motivation
 With the increase of Cloud Adoption, cost optimization has become a concern for organizations moving to the Cloud. Upon conducting a cost analysis of our Azure Subscriptions, we realized that Azure Caches for Redis were among the highest sources of expenditure. In our ecosystem of Micro-services, each service was using its own isolated Redis Cache for each environment. This is the same of many services and ecosystem across the industry. Furthermore, if you need to satisfy your customer demands of BCDR (Business Continuity Disaster Recovery), you might create replica Redis Caches in alternate regions.
-In most cases, we analyzed that these Caches were not used up to their full potential (both in terms of load and storage). Our analysis concluded that we were using about 1GB of the P1 Redis Caches. A single P1 cache can store 6GB of data. A single P1 Redis Cache costs around $412 per month. With three micro-services and each service is utilizing two Redis Caches were spending about $2,412 per month.
+In most cases, we analyzed that these Caches were not used up to their full potential (both in terms of load and storage). Our analysis concluded that we were using about 1GB of the P1 Redis Caches. A single P1 cache can store 6GB of data. A single P1 Redis Cache costs around **$412 per month**. With three micro-services and each service is utilizing two Redis Caches were spending about **$2,412 per month**.
 
 Such an analysis motivated us to look for opportunities to merge the existing Redis Caches into a single cluster shared by the existing applications. Still, it needed to ensure that each application had proper isolation.
 
@@ -35,16 +37,26 @@ This platform allows multiple application to re-use a single or a cluster of Red
 
 ![Nuget](https://img.shields.io/nuget/dt/DistributedCache.Extensions.UnifiedRedisPlatform?label=downloads%20extension)
 
-## Installation
-URP comes in 2 flavours:
-1. Core Package <br/>
-    All types of .NET application can use the core library (desktop, web, form)
-    ```
-    Install-Package UnifiedRedisPlatform`
-2. Extension of ASP.NET Core's `IDistributedCache` interface <br/>
-    If your application is built on ASP.NET Core and you want to utilize the existing `IDistributedCache`, then this library is recommended for you <br/>
-    ```
-    Install-Package DistributedCache.Extensions.UnifiedRedisPlatform
+## Getting Started
+Install the latest version of the core URP SDK package - [UnifiedRedisPlatform](https://www.nuget.org/packages/UnifiedRedisPlatform/)
+```
+Install-Package UnifiedRedisPlatform
+```
+
+Connect with Redis Cluster by creating a `IUnifiedConnecionMultiplexer`
+```
+IUnifiedConnectionMultiplexer connectionMux = UnifiedConnectionMultiplexer.Connect("Cluster ID", "App ID", "App Secret", preferredLocation: "Location")
+```
+
+Create a `IDatabase` to interact with the Redis Cache Database. The `IDatabase` interface is exposed by `StackExchange.Redis` library.
+```c#
+IDatabase _database = _mux.GetDatabase();
+```
+All methods exposed in `IDatabase` is available in URP
+```c#
+await _database.StringSetAsync(keyName, value);
+string value = await _database.StringGetAsync(keyName);
+```
 
 See more details in the [WiKi](https://github.com/microsoft/UnifiedRedisPlatform.Core/wiki)
 
