@@ -1,6 +1,7 @@
 # Unified Redis Platform (URP)
 
 ### [Official Documentation](https://github.com/microsoft/UnifiedRedisPlatform.Core/wiki/What-is-Unified-Redis-Platform-(URP)%3F)
+### [Blog](https://www.devcompost.com/post/__urp)
 
 ## Motivation
 With the increase of Cloud Adoption, cost optimization has become a concern for organizations moving to the Cloud. Upon conducting a cost analysis of our Azure Subscriptions, we realized that Azure Caches for Redis were among the highest sources of expenditure. In our ecosystem of Micro-services, each service was using its own isolated Redis Cache for each environment. This is the same of many services and ecosystem across the industry. Furthermore, if you need to satisfy your customer demands of BCDR (Business Continuity Disaster Recovery), you might create replica Redis Caches in alternate regions.
