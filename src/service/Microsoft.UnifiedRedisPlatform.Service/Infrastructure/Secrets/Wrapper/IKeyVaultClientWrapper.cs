@@ -1,6 +1,7 @@
-﻿using System.Threading;
+﻿using Azure;
+using Azure.Security.KeyVault.Secrets;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.KeyVault.Models;
 
 namespace Microsoft.UnifiedPlatform.Service.Secrets.Wrapper
 {
@@ -14,8 +15,8 @@ namespace Microsoft.UnifiedPlatform.Service.Secrets.Wrapper
         /// Wraps the GetSecretAsync by secret name method
         /// </summary>
         /// <param name="key">Secret key</param>
-        /// <param name="token" cref="CancellationToken">Cancellation token</param>
-        /// <returns cref="Task{SecretBundle}">Secret Bundle</returns>
-        Task<SecretBundle> GetSecretAsync(string key, CancellationToken token = default(CancellationToken));
+        /// <param name="token">Cancellation token</param>
+        /// <returns>KeyVault Secret</returns>
+        Task<Response<KeyVaultSecret>> GetSecretAsync(string key, CancellationToken token = default(CancellationToken));
     }
 }

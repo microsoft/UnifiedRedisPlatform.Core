@@ -1,4 +1,6 @@
-﻿using Microsoft.Identity.Client;
+﻿using Azure.Core;
+using Azure.Identity;
+using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.UnifiedPlatform.Service.Common.Authentication;
 using System;
@@ -6,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.UnifiedPlatform.Service.Authentication
@@ -48,12 +51,16 @@ namespace Microsoft.UnifiedPlatform.Service.Authentication
             confidentialApps.TryAdd(confidentialAppCacheKey, confidentialClientApplication);
             return confidentialClientApplication;
 #else
-            IConfidentialClientApplication app =  ConfidentialClientApplicationBuilder
-                                                .Create(clientId)
-                                                .WithAuthority(new Uri(authority))
-                                                .WithClientAssertion(new ManagedIdentityClientAssertion(clientId).GetSignedAssertion).Build();
-             confidentialApps.TryAdd(confidentialAppCacheKey, app);
-             return app;
+
+            IConfidentialClientApplication clientApplicationWithMI = ConfidentialClientApplicationBuilder.Create(clientId).WithAuthority(new Uri(authority))
+              .WithClientAssertion((AssertionRequestOptions options) =>
+              {
+                  var accessToken = new DefaultAzureCredential().GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
+                  return Task.FromResult(accessToken.Token);
+              }).Build();
+            confidentialApps.TryAdd(confidentialAppCacheKey, clientApplicationWithMI);
+            return clientApplicationWithMI;
+
 #endif
         }
 

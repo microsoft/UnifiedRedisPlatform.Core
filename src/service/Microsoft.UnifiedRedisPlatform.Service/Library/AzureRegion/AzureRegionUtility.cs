@@ -1,4 +1,6 @@
-﻿using GeoCoordinatePortable;
+﻿using Azure.Core;
+using Azure.Identity;
+using GeoCoordinatePortable;
 using Microsoft.AzureRegion.Models;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.AzureRegion
@@ -165,12 +168,15 @@ namespace Microsoft.AzureRegion
                 confidentialApps.TryAdd(confidentialAppCacheKey, confidentialClientApplication);
                 return confidentialClientApplication;
 #else
-                IConfidentialClientApplication app =  ConfidentialClientApplicationBuilder
-                                                .Create(clientId)
-                                                .WithAuthority(new Uri(authority))
-                                                .WithClientAssertion(new ManagedIdentityClientAssertion(clientId).GetSignedAssertion).Build();
-                confidentialApps.TryAdd(confidentialAppCacheKey, app);
-                return app;
+
+                IConfidentialClientApplication clientApplicationWithMI = ConfidentialClientApplicationBuilder.Create(clientId).WithAuthority(new Uri(authority))
+                .WithClientAssertion((AssertionRequestOptions options) =>
+                {
+                    var accessToken = new DefaultAzureCredential().GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
+                    return Task.FromResult(accessToken.Token);
+                }).Build();
+                confidentialApps.TryAdd(confidentialAppCacheKey, clientApplicationWithMI);
+                return clientApplicationWithMI;
 #endif
             }
             catch (Exception)
