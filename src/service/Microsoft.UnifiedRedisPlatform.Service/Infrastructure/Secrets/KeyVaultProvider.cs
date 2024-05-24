@@ -1,12 +1,13 @@
-﻿using System.Net;
-using System.Threading.Tasks;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.KeyVault.Models;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.UnifiedPlatform.Service.Common.Secrets;
-using Microsoft.UnifiedPlatform.Service.Common.Caching;
-using Microsoft.UnifiedPlatform.Service.Secrets.Wrapper;
+﻿using Azure;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.UnifiedPlatform.Service.Common.AppExceptions;
+using Microsoft.UnifiedPlatform.Service.Common.Caching;
+using Microsoft.UnifiedPlatform.Service.Common.Secrets;
+using Microsoft.UnifiedPlatform.Service.Secrets.Wrapper;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Provides application secrets from Azure Key Vault
@@ -27,9 +28,10 @@ public class KeyVaultProvider: ISecretsProvider
     {
         var keyVaultUri = string.Format(KEY_VAULT_URI_FORMAT, keyVaultName);
         _cacheService = cacheService;
-        var tokenProvider = new AzureServiceTokenProvider();
-        var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
-        _keyVaultClientWrapper = new KeyVaultClientWrapper(keyVaultUri, keyVaultClient);
+        var credential = new DefaultAzureCredential();
+        var secretClient = new SecretClient(new Uri(keyVaultUri), credential);
+
+        _keyVaultClientWrapper = new KeyVaultClientWrapper(keyVaultUri, secretClient);
     }
 
     /// <summary>
@@ -58,15 +60,15 @@ public class KeyVaultProvider: ISecretsProvider
 
         try
         {
-            var secretBundle = await _keyVaultClientWrapper.GetSecretAsync(key);
-            var secret = secretBundle.Value;
+            var keyVaultSecret = await _keyVaultClientWrapper.GetSecretAsync(key);
+            var secret = keyVaultSecret?.Value?.Value;
             await _cacheService.Set(key, secret);
             return secret;
 
         }
-        catch (KeyVaultErrorException exception)
+        catch (RequestFailedException exception)
         {
-            if (exception.Response.StatusCode == HttpStatusCode.NotFound)
+            if (exception.Status == Convert.ToInt32(HttpStatusCode.NotFound))
                 throw new SecretNotFoundException(key, innerException: exception);
             throw;
         }

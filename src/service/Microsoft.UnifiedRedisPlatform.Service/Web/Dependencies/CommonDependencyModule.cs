@@ -116,9 +116,9 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 .WithParameter(new ResolvedParameter(
                     (pi, ctx) => pi.Name == "clientId",
                     (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "AAD:Audience").Result))
-                .WithParameter(new ResolvedParameter(
-                    (pi, ctx) => pi.Name == "clientSecret",
-                    (pi, ctx) => ctx.Resolve<ISecretsProvider>().GetSecret("Authentication-AAD-Secret").Result))
+                 .WithParameter(new ResolvedParameter(
+                  (pi, ctx) => pi.Name == "certificateThumbprint",
+                  (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "LocalDebugging:CertificateThumbprint").Result))
                 .SingleInstance();
 
             builder.RegisterType<RedisClusterAuthenticator>()
@@ -222,10 +222,10 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
         {
             builder.RegisterType<AzureRegionUtility>()
                 .As<IAzureRegionUtility>()
-                .WithParameter(new ResolvedParameter(
-                    (pi, ctx) => pi.Name.ToLowerInvariant() == "clientSecret".ToLowerInvariant(),
-                    (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(SecretsConfigurationProviderKey).GetConfiguration("AzureContributor-SPN", "Secret").Result))
-                .SingleInstance();
+                 .WithParameter(new ResolvedParameter(
+                    (pi, ctx) => pi.Name == "certificateThumbprint",
+                    (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "LocalDebugging:CertificateThumbprint").Result))
+               .SingleInstance();
         }
 
         protected virtual void RegisterRedisProviders(ContainerBuilder builder)

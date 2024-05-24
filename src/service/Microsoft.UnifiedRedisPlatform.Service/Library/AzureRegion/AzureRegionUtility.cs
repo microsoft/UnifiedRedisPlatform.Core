@@ -1,12 +1,18 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
-using System.Net.Http;
+﻿using Azure.Core;
+using Azure.Identity;
 using GeoCoordinatePortable;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.AzureRegion.Models;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.AzureRegion
 {
@@ -17,38 +23,40 @@ namespace Microsoft.AzureRegion
         public string AzureManagementAadResourceId { get; set; }
         public string AadAuthority { get; set; }
         public string AadClientId { get; set; }
-        public string AadClientSecret { get; set; }
         public int CacheDurationInMins { get; set; }
 
         private readonly IHttpClientFactory _httpClientFactory;
 
         private static List<RegionModel> _cachedAzureRegions = new List<RegionModel>();
         private static DateTime _cachedUntil = DateTime.UtcNow;
+        private readonly ConcurrentDictionary<string, IConfidentialClientApplication> confidentialApps = new ConcurrentDictionary<string, IConfidentialClientApplication>();
+        private readonly string CertificateThumbprint;
 
-        public AzureRegionUtility(string clientSecret)
+        public AzureRegionUtility(string certificateThumbprint)
             : this(azureSubscriptionId: "05a315f7-744f-4692-b9dd-1aed7c6cee64",
                  azureManagementEndpoint: "https://management.azure.com/subscriptions/{0}/locations?api-version=2019-06-01",
                  azureAadResourceId: "https://management.core.windows.net/",
                  aadAuthority: "https://login.microsoftonline.com/microsoft.onmicrosoft.com",
                  aadClientId: "1601a33e-356e-4570-8325-eefe6116eadb",
-                 aadClientSecret: clientSecret,
-                 cacheDurationInMins: 43200)
+                 cacheDurationInMins: 43200,
+                 certificateThumbprint: certificateThumbprint
+                 )
         { }
 
-        public AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, string aadClientSecret, int cacheDurationInMins)
-            : this(azureSubscriptionId, azureManagementEndpoint, azureAadResourceId, aadAuthority, aadClientId, aadClientSecret, cacheDurationInMins, new HttpClientFactory())
+        public AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, int cacheDurationInMins, string certificateThumbprint)
+            : this(azureSubscriptionId, azureManagementEndpoint, azureAadResourceId, aadAuthority, aadClientId, cacheDurationInMins, certificateThumbprint, new HttpClientFactory())
         {
         }
 
-        internal AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, string aadClientSecret, int cacheDurationInMins, IHttpClientFactory clientFactory)
+        internal AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, int cacheDurationInMins, string certificateThumbprint, IHttpClientFactory clientFactory)
         {
             AzureSubscriptionId = azureSubscriptionId;
             AzureManagementEndpoint = azureManagementEndpoint;
             AzureManagementAadResourceId = azureAadResourceId;
             AadAuthority = aadAuthority;
             AadClientId = aadClientId;
-            AadClientSecret = aadClientSecret;
             CacheDurationInMins = cacheDurationInMins;
+            CertificateThumbprint = certificateThumbprint;
             _httpClientFactory = clientFactory;
         }
 
@@ -80,7 +88,7 @@ namespace Microsoft.AzureRegion
             return _cachedAzureRegions;
         }
 
-        public async Task<bool> Exists(string regionName) 
+        public async Task<bool> Exists(string regionName)
         {
             var regions = await GetAllAzureRegions();
             return regions.Any(region => region.Name == regionName);
@@ -128,9 +136,69 @@ namespace Microsoft.AzureRegion
 
         private async Task<string> GenerateAuthToken()
         {
-            var authContext = new AuthenticationContext(AadAuthority);
-            var authResult = await authContext.AcquireTokenAsync(AzureManagementAadResourceId, new ClientCredential(AadClientId, AadClientSecret));
-            return authResult.AccessToken;
+            try
+            {
+                IConfidentialClientApplication app = GetOrCreateConfidentialApp(AadAuthority, AadClientId);
+
+                var authResult = await app.AcquireTokenForClient(new[] { $"{AzureManagementAadResourceId}/.default" }).ExecuteAsync();
+                return authResult.AccessToken;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private IConfidentialClientApplication GetOrCreateConfidentialApp(string authority, string clientId)
+        {
+            try
+            {
+                string confidentialAppCacheKey = CreateConfidentialAppCacheKey(authority, clientId);
+                if (confidentialApps.ContainsKey(confidentialAppCacheKey))
+                {
+                    return confidentialApps[confidentialAppCacheKey];
+                }
+#if DEBUG
+                var certificate = GetCertificate(CertificateThumbprint);
+
+                IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder.Create(clientId)
+                                                                                .WithAuthority(authority)
+                                                                                .WithCertificate(certificate, true)
+                                                                                .Build();
+                confidentialApps.TryAdd(confidentialAppCacheKey, confidentialClientApplication);
+                return confidentialClientApplication;
+#else
+
+                IConfidentialClientApplication clientApplicationWithMI = ConfidentialClientApplicationBuilder.Create(clientId).WithAuthority(new Uri(authority))
+                .WithClientAssertion((AssertionRequestOptions options) =>
+                {
+                    var accessToken = new DefaultAzureCredential().GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
+                    return Task.FromResult(accessToken.Token);
+                }).Build();
+                confidentialApps.TryAdd(confidentialAppCacheKey, clientApplicationWithMI);
+                return clientApplicationWithMI;
+#endif
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private static string CreateConfidentialAppCacheKey(string authority, string clientId)
+        {
+            return $"{authority}-{clientId}";
+        }
+
+        public X509Certificate2 GetCertificate(string certificateThumbprint)
+        {
+            using (var store = new X509Store(StoreName.Root, StoreLocation.LocalMachine))
+            {
+                store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+                var cert = store.Certificates.OfType<X509Certificate2>()
+                    .FirstOrDefault(x => x.Thumbprint?.ToUpper() == certificateThumbprint?.ToUpper());
+                return cert;
+            }
         }
     }
 }

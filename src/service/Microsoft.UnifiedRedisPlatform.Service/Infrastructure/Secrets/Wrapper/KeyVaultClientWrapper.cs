@@ -1,7 +1,7 @@
-﻿using System.Threading;
+﻿using Azure;
+using Azure.Security.KeyVault.Secrets;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.KeyVault.Models;
 
 namespace Microsoft.UnifiedPlatform.Service.Secrets.Wrapper
 {
@@ -11,7 +11,7 @@ namespace Microsoft.UnifiedPlatform.Service.Secrets.Wrapper
     /// <remarks>Used for help for mocking in unit testing</remarks>
     public class KeyVaultClientWrapper : IKeyVaultClientWrapper
     {
-        private readonly KeyVaultClient _keyVaultClient;
+        private readonly SecretClient _secretClient;
         private readonly string _keyVaultBaseUri;
 
         /// <summary>
@@ -19,21 +19,21 @@ namespace Microsoft.UnifiedPlatform.Service.Secrets.Wrapper
         /// </summary>
         /// <param name="keyVaultBaseUri">The base URL of the Key Vault</param>
         /// <param name="keyVaultClient">The actual client for interfacing with KeyVault</param>
-        public KeyVaultClientWrapper(string keyVaultBaseUri, KeyVaultClient keyVaultClient)
+        public KeyVaultClientWrapper(string keyVaultBaseUri, SecretClient secretClient)
         {
             _keyVaultBaseUri = keyVaultBaseUri;
-            _keyVaultClient = keyVaultClient;
+            _secretClient = secretClient;
         }
 
         /// <summary>
         /// Wraps the GetSecretAsync by secret name method
         /// </summary>
         /// <param name="key">Secret key</param>
-        /// <param name="token" cref="CancellationToken">Cancellation token</param>
-        /// <returns cref="Task{SecretBundle}">Secret Bundle</returns>
-        public Task<SecretBundle> GetSecretAsync(string key, CancellationToken token = default(CancellationToken))
+        /// <param name="token">Cancellation token</param>
+        /// <returns>KeyVault Secret</returns>
+        public Task<Response<KeyVaultSecret>> GetSecretAsync(string key, CancellationToken token = default(CancellationToken))
         {
-            return _keyVaultClient.GetSecretAsync(_keyVaultBaseUri, key, token);
+            return _secretClient.GetSecretAsync(key, null, token);
         }
     }
 }
