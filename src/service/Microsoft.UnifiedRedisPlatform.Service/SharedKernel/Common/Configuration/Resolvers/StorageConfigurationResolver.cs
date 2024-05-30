@@ -17,10 +17,8 @@ namespace Microsoft.UnifiedPlatform.Service.Common.Configuration.Resolvers
         {
             return new StorageConfiguration()
             {
-                StorageAccountName = _configurationProvider.GetConfiguration("Storage", "Name").Result,
-                StorageAccountKey = _secretConfigurationProvider.GetConfiguration("Storage", "Key").Result,
-                ConfigurationTableName = _configurationProvider.GetConfiguration("Storage", "ConfigurationTable").Result,          
-              
+                StorageAccountName = _configurationProvider.GetConfiguration("Storage", "Name").Result,                
+                ConfigurationTableName = _configurationProvider.GetConfiguration("Storage", "ConfigurationTable").Result,                    
                 BackoffInternal = TimeSpan.FromMilliseconds(int.Parse(_configurationProvider.GetConfiguration("Storage", "BackoffInterval").Result)),
                 MaxAttempt = int.Parse(_configurationProvider.GetConfiguration("Storage", "MaxAttempt").Result)
             };
