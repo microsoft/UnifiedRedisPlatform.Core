@@ -7,10 +7,12 @@
   <ItemGroup>
     <PackageReference Include="AppInsights.EnterpriseTelemetry" Version="1.0.2" />
     <PackageReference Include="AppInsights.EnterpriseTelemetry.AspNetCore.Extension" Version="1.0.3" />
+    <PackageReference Include="Azure.Identity" Version="1.11.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.30" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
-    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.8.3" />
+
   </ItemGroup>
 
 </Project>
