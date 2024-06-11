@@ -1,15 +1,13 @@
-﻿using System;
-using Autofac;
-using Microsoft.Extensions.Configuration;
+﻿using AppInsights.EnterpriseTelemetry.AppInsightsInitializers;
 using AppInsights.EnterpriseTelemetry.Web.Extension;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
-using AppInsights.EnterpriseTelemetry.AppInsightsInitializers;
-using Microsoft.UnifiedRedisPlatform.Service.Function.DependencyResolution;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using System.Runtime.CompilerServices;
-using System.IO;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UnifiedRedisPlatform.Service.Function.DependencyResolution;
+using System;
 
 [assembly: FunctionsStartup(typeof(Microsoft.UnifiedRedisPlatform.Service.Function.Startup))]
 

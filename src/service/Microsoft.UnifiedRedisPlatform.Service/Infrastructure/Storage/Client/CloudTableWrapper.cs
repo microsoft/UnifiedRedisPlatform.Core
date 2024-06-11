@@ -1,27 +1,38 @@
-﻿using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+﻿using Azure;
+using Azure.Data.Tables;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Microsoft.UnifiedPlatform.Storage.Client
 {
     public class CloudTableWrapper : ITable
     {
-        private readonly CloudTable _baseCloudTable;
 
-        public CloudTableWrapper(CloudTable baseCloudTable)
+        private readonly TableClient _baseTableClient;
+
+        public CloudTableWrapper(TableClient baseTableClient)
         {
-            _baseCloudTable = baseCloudTable;
+            _baseTableClient = baseTableClient;
         }
 
-        public Task<TableResult> ExecuteAsync(TableOperation operation, TableRequestOptions requestOptions, OperationContext operationContext)
+        public async Task<T> GetAsync<T>(string partitionKey, string rowKey) where T :class, ITableEntity, new()
         {
-            return _baseCloudTable.ExecuteAsync(operation, requestOptions, operationContext);
+            return await _baseTableClient.GetEntityAsync<T>(partitionKey, rowKey);
         }
 
-        public Task<TableQuerySegment<T>> ExecuteQuerySegmentedAsync<T>(TableQuery<T> query, TableContinuationToken token, TableRequestOptions requestOptions, OperationContext operationContext) where T : ITableEntity, new()
+        public async Task<List<T>> GetllAsync<T>(string partitionKey) where T : class, ITableEntity, new()
         {
-            return _baseCloudTable.ExecuteQuerySegmentedAsync<T>(query, token, requestOptions, operationContext);
+            var result = new List<T>();
+            var partitionKeyFilter = $"PartitionKey eq '{partitionKey}'";
+            AsyncPageable<T> tableResult = _baseTableClient.QueryAsync<T>(partitionKeyFilter);
+            var enumerator = tableResult.GetAsyncEnumerator();
+
+            while (await enumerator.MoveNextAsync())
+            {
+                result.Add(enumerator.Current);
+            }
+            return result;
         }
+
     }
-
 }
