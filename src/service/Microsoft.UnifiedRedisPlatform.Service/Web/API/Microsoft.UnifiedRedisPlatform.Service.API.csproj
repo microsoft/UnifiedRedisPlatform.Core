@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.30" />
+    <PackageReference Include="Microsoft.Identity.ServiceEssentials.AspNetCore" Version="1.25.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -36,6 +36,8 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            //To do : MISE claims-based authorization module is not available as per the documentation.Once available,we need to make the changes
+            //https://identitydivision.visualstudio.com/DevEx/_git/MISE?path=/docs/MigrationGuides/JwtBearerHandler/Readme.md&_a=preview
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -44,7 +46,7 @@ namespace API
                         Configuration["KeyVault:Name"],
                         new InMemoryCache(new MemoryCache(new MemoryCacheOptions())));
                     var signingKey = secretProvider.GetSecret("Authentication-RedisCluster-Secret").Result;
-
+                   
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,
