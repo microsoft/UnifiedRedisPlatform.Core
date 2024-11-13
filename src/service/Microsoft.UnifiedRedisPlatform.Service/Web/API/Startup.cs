@@ -19,6 +19,7 @@ using Microsoft.UnifiedRedisPlatform.Service.API.Middlewares;
 using AppInsights.EnterpriseTelemetry.Web.Extension.Middlewares;
 using Microsoft.UnifiedRedisPlatform.Service.API.ExceptionHandler;
 using Microsoft.UnifiedRedisPlatform.Service.API.DependencyResolution;
+using Microsoft.UnifiedRedisPlatform.Service.API.Telemetry;
 
 namespace API
 {
@@ -81,7 +82,7 @@ namespace API
             {
                 options.Filters.Add<TrackingPropertiesFilterAttribute>();
             }).AddNewtonsoftJson();
-
+            services.AddApplicationInsightsTelemetryProcessor<FilterTelemetryProcessor>();
             RegisterDependencies(services, Configuration);
             return new AutofacServiceProvider(ApplicationContainer);
         }
