@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.18" />
     <PackageReference Include="Microsoft.CQRS" Version="1.0.1" />
     <PackageReference Include="Microsoft.FXP.Telemetry" Version="1.0.0-beta.1" />
     <PackageReference Include="Microsoft.FXP.Telemetry.Web.Extension" Version="1.0.0-beta.1" />
