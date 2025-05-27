@@ -45,7 +45,9 @@ namespace API
                 {
                     var secretProvider = new KeyVaultProvider(
                         Configuration["KeyVault:Name"],
-                        new InMemoryCache(new MemoryCache(new MemoryCacheOptions())));
+                        Configuration["Authentication:UserAssignedClientId"],
+                        Configuration["ASPNETCORE_ENVIRONMENT"],
+                new InMemoryCache(new MemoryCache(new MemoryCacheOptions())));
                     var signingKey = secretProvider.GetSecret("Authentication-RedisCluster-Secret").Result;
                    
                     options.TokenValidationParameters = new TokenValidationParameters()
@@ -63,7 +65,7 @@ namespace API
                 {
                     options.Audience = Configuration["Authentication:AAD:Audience"];
                     options.Authority = Configuration["Authentication:AAD:Authority"];
-
+                
                 });
 
             services.AddAuthorization(options =>

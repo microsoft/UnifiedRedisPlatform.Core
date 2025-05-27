@@ -19,11 +19,13 @@ namespace Microsoft.UnifiedPlatform.Service.Authentication
         private readonly string _clientId;
         private readonly ConcurrentDictionary<string, IConfidentialClientApplication> confidentialApps = new ConcurrentDictionary<string, IConfidentialClientApplication>();
         private readonly string _certificateThumprint;
-        public AadAuthenticator(string authority, string clientId, string certificateThumbprint)
+        private readonly string _userAssignedClientId;
+        public AadAuthenticator(string authority, string clientId, string certificateThumbprint,string userAssignedClientId)
         {
             _authority = authority;
             _clientId = clientId;
             _certificateThumprint = certificateThumbprint;
+            _userAssignedClientId= userAssignedClientId;
         }
 
         public async Task<string> GenerateToken(string resourceId, Dictionary<string, string> additionalClaims)
@@ -51,11 +53,12 @@ namespace Microsoft.UnifiedPlatform.Service.Authentication
             confidentialApps.TryAdd(confidentialAppCacheKey, confidentialClientApplication);
             return confidentialClientApplication;
 #else
-
+            var managedIdentityId = ManagedIdentityId.FromUserAssignedClientId(_userAssignedClientId);
+            var credential = new ManagedIdentityCredential(managedIdentityId);
             IConfidentialClientApplication clientApplicationWithMI = ConfidentialClientApplicationBuilder.Create(clientId).WithAuthority(new Uri(authority))
               .WithClientAssertion((AssertionRequestOptions options) =>
               {
-                  var accessToken = new DefaultAzureCredential().GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
+                  var accessToken = credential.GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
                   return Task.FromResult(accessToken.Token);
               }).Build();
             confidentialApps.TryAdd(confidentialAppCacheKey, clientApplicationWithMI);

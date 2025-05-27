@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Azure.Core;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.UnifiedPlatform.Service.Common.AppExceptions;
@@ -8,11 +9,12 @@ using Microsoft.UnifiedPlatform.Service.Secrets.Wrapper;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using ManagedIdentityId = Azure.Identity.ManagedIdentityId;
 
 /// <summary>
 /// Provides application secrets from Azure Key Vault
 /// </summary>
-public class KeyVaultProvider: ISecretsProvider
+public class KeyVaultProvider : ISecretsProvider
 {
     public const string KEY_VAULT_URI_FORMAT = "https://{0}.vault.azure.net";
 
@@ -24,11 +26,24 @@ public class KeyVaultProvider: ISecretsProvider
     /// </summary>
     /// <param name="configuration" cref="KeyvaultConfiguration">Configuration for connecting to Azure Key Vault</param>
     /// <param name="cacheService" cref="ICacheService">Service for caching data</param>
-    public KeyVaultProvider(string keyVaultName, ICacheService cacheService)
+    public KeyVaultProvider(string keyVaultName, string userAssignedClientId, string environment, ICacheService cacheService)
     {
         var keyVaultUri = string.Format(KEY_VAULT_URI_FORMAT, keyVaultName);
         _cacheService = cacheService;
-        var credential = new DefaultAzureCredential();
+      
+        TokenCredential credential;
+        if (environment == "Production"|| environment=="Staging")
+        {
+            var managedIdentityId = ManagedIdentityId.FromUserAssignedClientId(userAssignedClientId);
+            credential = new ManagedIdentityCredential(managedIdentityId);
+        }
+        else
+        {
+            credential = new ChainedTokenCredential(
+            new VisualStudioCredential(),
+            new AzureCliCredential(),
+            new AzurePowerShellCredential());
+        }            
         var secretClient = new SecretClient(new Uri(keyVaultUri), credential);
 
         _keyVaultClientWrapper = new KeyVaultClientWrapper(keyVaultUri, secretClient);
