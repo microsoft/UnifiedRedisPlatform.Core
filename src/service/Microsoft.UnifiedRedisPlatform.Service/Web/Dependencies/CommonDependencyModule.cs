@@ -27,6 +27,8 @@ using Microsoft.UnifiedPlatform.Service.Application.Commands.Handlers;
 using Microsoft.UnifiedPlatform.Service.Common.Configuration.Resolvers;
 using Microsoft.UnifiedPlatform.Service.Common.Helpers;
 using Microsoft.Extensions.Hosting;
+using Azure.Identity;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResolution
 {
@@ -102,9 +104,6 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 .WithParameter(new ResolvedParameter(
                   (pi, ctx) => pi.Name == "userAssignedClientId",
                   (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "UserAssignedClientId").Result))
-                 .WithParameter(new ResolvedParameter(
-                  (pi, ctx) => pi.Name == "environment",
-                  (pi, ctx) => ctx.Resolve<IHostingEnvironment>().EnvironmentName))
                 .SingleInstance();
 
             builder.RegisterType<SecretsConfigurationProvider>()
@@ -301,25 +300,15 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
 
         protected virtual void RegisterHelpers(ContainerBuilder builder)
         {
-            // Resolve IConfiguration from the container
-            builder.RegisterBuildCallback(c =>
-            {
-                var config = c.Resolve<IConfiguration>();
-                var env = config["ASPNETCORE_ENVIRONMENT"] ?? "Development";
-
-                if (env == "Production" || env == "Staging")
-                {
-                    builder.RegisterType<UserAssignedIdentityCredentialProvider>()
-                           .As<IDefaultAzureCredentialProvider>()
-                           .SingleInstance();
-                }
-                else
-                {
-                    builder.RegisterType<DefaultAzureCredentialProvider>()
-                           .As<IDefaultAzureCredentialProvider>()
-                           .SingleInstance();
-                }
-            });
+            #if DEBUG
+            builder.RegisterType<DefaultAzureCredentialProvider>()
+                 .As<IDefaultAzureCredentialProvider>()
+                 .SingleInstance();
+            #else
+             builder.RegisterType<UserAssignedIdentityCredentialProvider>()
+                 .As<IDefaultAzureCredentialProvider>()
+                 .SingleInstance();
+            #endif
         }
     }
 }

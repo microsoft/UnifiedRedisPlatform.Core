@@ -45,8 +45,7 @@ namespace API
                 {
                     var secretProvider = new KeyVaultProvider(
                         Configuration["KeyVault:Name"],
-                        Configuration["Authentication:UserAssignedClientId"],
-                        Configuration["ASPNETCORE_ENVIRONMENT"],
+                        Configuration["Authentication:UserAssignedClientId"],                      
                 new InMemoryCache(new MemoryCache(new MemoryCacheOptions())));
                     var signingKey = secretProvider.GetSecret("Authentication-RedisCluster-Secret").Result;
                    

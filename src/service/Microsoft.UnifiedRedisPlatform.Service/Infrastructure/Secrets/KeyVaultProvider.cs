@@ -26,24 +26,19 @@ public class KeyVaultProvider : ISecretsProvider
     /// </summary>
     /// <param name="configuration" cref="KeyvaultConfiguration">Configuration for connecting to Azure Key Vault</param>
     /// <param name="cacheService" cref="ICacheService">Service for caching data</param>
-    public KeyVaultProvider(string keyVaultName, string userAssignedClientId, string environment, ICacheService cacheService)
+    public KeyVaultProvider(string keyVaultName, string userAssignedClientId, ICacheService cacheService)
     {
         var keyVaultUri = string.Format(KEY_VAULT_URI_FORMAT, keyVaultName);
         _cacheService = cacheService;
       
         TokenCredential credential;
-        if (environment == "Production"|| environment=="Staging")
-        {
+        #if DEBUG
+            credential = new VisualStudioCredential();
+        #else
             var managedIdentityId = ManagedIdentityId.FromUserAssignedClientId(userAssignedClientId);
             credential = new ManagedIdentityCredential(managedIdentityId);
-        }
-        else
-        {
-            credential = new ChainedTokenCredential(
-            new VisualStudioCredential(),
-            new AzureCliCredential(),
-            new AzurePowerShellCredential());
-        }            
+        #endif
+                
         var secretClient = new SecretClient(new Uri(keyVaultUri), credential);
 
         _keyVaultClientWrapper = new KeyVaultClientWrapper(keyVaultUri, secretClient);

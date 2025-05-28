@@ -9,10 +9,7 @@ namespace Microsoft.UnifiedPlatform.Service.Common.Helpers
     {
         public TokenCredential GetDefaultAzureCredential(string userManagedIdentity)
         {
-            return new ChainedTokenCredential(
-            new VisualStudioCredential(),
-            new AzureCliCredential(),
-            new AzurePowerShellCredential());
+            return new VisualStudioCredential();
         }
     }
 }
