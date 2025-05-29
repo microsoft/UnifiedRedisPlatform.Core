@@ -3,7 +3,6 @@ using Azure.Identity;
 using GeoCoordinatePortable;
 using Microsoft.AzureRegion.Models;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Web;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -31,6 +30,7 @@ namespace Microsoft.AzureRegion
         private static DateTime _cachedUntil = DateTime.UtcNow;
         private readonly ConcurrentDictionary<string, IConfidentialClientApplication> confidentialApps = new ConcurrentDictionary<string, IConfidentialClientApplication>();
         private readonly string CertificateThumbprint;
+        private readonly string UserAssignedClientId;
 
         public AzureRegionUtility(string certificateThumbprint)
             : this(azureSubscriptionId: "05a315f7-744f-4692-b9dd-1aed7c6cee64",
@@ -39,16 +39,17 @@ namespace Microsoft.AzureRegion
                  aadAuthority: "https://login.microsoftonline.com/microsoft.onmicrosoft.com",
                  aadClientId: "1601a33e-356e-4570-8325-eefe6116eadb",
                  cacheDurationInMins: 43200,
-                 certificateThumbprint: certificateThumbprint
+                 certificateThumbprint: certificateThumbprint,
+                 userAssignedClientId: "ddcbb4aa-01a9-46aa-8c11-03e1b789d9cd"
                  )
         { }
 
-        public AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, int cacheDurationInMins, string certificateThumbprint)
-            : this(azureSubscriptionId, azureManagementEndpoint, azureAadResourceId, aadAuthority, aadClientId, cacheDurationInMins, certificateThumbprint, new HttpClientFactory())
+        public AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, int cacheDurationInMins, string certificateThumbprint, string userAssignedClientId)
+            : this(azureSubscriptionId, azureManagementEndpoint, azureAadResourceId, aadAuthority, aadClientId, cacheDurationInMins, certificateThumbprint, userAssignedClientId, new HttpClientFactory())
         {
         }
 
-        internal AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, int cacheDurationInMins, string certificateThumbprint, IHttpClientFactory clientFactory)
+        internal AzureRegionUtility(string azureSubscriptionId, string azureManagementEndpoint, string azureAadResourceId, string aadAuthority, string aadClientId, int cacheDurationInMins, string certificateThumbprint, string userAssignedClientId, IHttpClientFactory clientFactory)
         {
             AzureSubscriptionId = azureSubscriptionId;
             AzureManagementEndpoint = azureManagementEndpoint;
@@ -57,6 +58,7 @@ namespace Microsoft.AzureRegion
             AadClientId = aadClientId;
             CacheDurationInMins = cacheDurationInMins;
             CertificateThumbprint = certificateThumbprint;
+            UserAssignedClientId = userAssignedClientId;
             _httpClientFactory = clientFactory;
         }
 
@@ -138,7 +140,7 @@ namespace Microsoft.AzureRegion
         {
             try
             {
-                IConfidentialClientApplication app = GetOrCreateConfidentialApp(AadAuthority, AadClientId);
+                IConfidentialClientApplication app = GetOrCreateConfidentialApp(AadAuthority, AadClientId, UserAssignedClientId);
 
                 var authResult = await app.AcquireTokenForClient(new[] { $"{AzureManagementAadResourceId}/.default" }).ExecuteAsync();
                 return authResult.AccessToken;
@@ -149,7 +151,7 @@ namespace Microsoft.AzureRegion
             }
         }
 
-        private IConfidentialClientApplication GetOrCreateConfidentialApp(string authority, string clientId)
+        private IConfidentialClientApplication GetOrCreateConfidentialApp(string authority, string clientId, string userAssignedClientId)
         {
             try
             {
@@ -169,10 +171,13 @@ namespace Microsoft.AzureRegion
                 return confidentialClientApplication;
 #else
 
+                var managedIdentityId = ManagedIdentityId.FromUserAssignedClientId(userAssignedClientId);
+                var credential = new ManagedIdentityCredential(managedIdentityId);
+
                 IConfidentialClientApplication clientApplicationWithMI = ConfidentialClientApplicationBuilder.Create(clientId).WithAuthority(new Uri(authority))
                 .WithClientAssertion((AssertionRequestOptions options) =>
                 {
-                    var accessToken = new DefaultAzureCredential().GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
+                    var accessToken = credential.GetToken(new TokenRequestContext(new string[] { $"api://AzureADTokenExchange/.default" }), CancellationToken.None);
                     return Task.FromResult(accessToken.Token);
                 }).Build();
                 confidentialApps.TryAdd(confidentialAppCacheKey, clientApplicationWithMI);

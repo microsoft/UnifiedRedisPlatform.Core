@@ -7,8 +7,9 @@
   <ItemGroup>
     <PackageReference Include="AppInsights.EnterpriseTelemetry" Version="1.0.2" />
     <PackageReference Include="AppInsights.EnterpriseTelemetry.AspNetCore.Extension" Version="1.0.3" />
-    <PackageReference Include="Azure.Identity" Version="1.11.3" />
+    <PackageReference Include="Azure.Identity" Version="1.14.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.30" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.72.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
     <PackageReference Include="Azure.Data.Tables" Version="12.8.3" />

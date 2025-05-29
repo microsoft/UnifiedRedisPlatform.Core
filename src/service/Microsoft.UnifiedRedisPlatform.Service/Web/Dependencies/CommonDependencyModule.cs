@@ -26,6 +26,9 @@ using Microsoft.UnifiedPlatform.Service.Application.Queries.Handlers;
 using Microsoft.UnifiedPlatform.Service.Application.Commands.Handlers;
 using Microsoft.UnifiedPlatform.Service.Common.Configuration.Resolvers;
 using Microsoft.UnifiedPlatform.Service.Common.Helpers;
+using Microsoft.Extensions.Hosting;
+using Azure.Identity;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResolution
 {
@@ -57,7 +60,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
             RegisterConfigurationProviders(builder);
             RegisterConfigurations(builder);
             RegisterAzureRegionUtility(builder);
-            RegisterRedisProviders(builder);            
+            RegisterRedisProviders(builder);
             RegisterRequestHandlerResolver(builder);
             RegisterQueries(builder);
             RegisterCommands(builder);
@@ -88,7 +91,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
         }
 
         protected virtual void RegisterApplicationInsights(ContainerBuilder builder)
-        { 
+        {
         }
 
         protected virtual void RegisterKeyVault(ContainerBuilder builder)
@@ -98,6 +101,9 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 .WithParameter(new ResolvedParameter(
                     (pi, ctx) => pi.ParameterType == typeof(string) && pi.Name == "keyVaultName",
                     (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("KeyVault", "Name").Result))
+                .WithParameter(new ResolvedParameter(
+                  (pi, ctx) => pi.Name == "userAssignedClientId",
+                  (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "UserAssignedClientId").Result))
                 .SingleInstance();
 
             builder.RegisterType<SecretsConfigurationProvider>()
@@ -119,7 +125,10 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                  .WithParameter(new ResolvedParameter(
                   (pi, ctx) => pi.Name == "certificateThumbprint",
                   (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "LocalDebugging:CertificateThumbprint").Result))
-                .SingleInstance();
+                  .WithParameter(new ResolvedParameter(
+                  (pi, ctx) => pi.Name == "userAssignedClientId",
+                  (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "UserAssignedClientId").Result))
+                 .SingleInstance();
 
             builder.RegisterType<RedisClusterAuthenticator>()
                 .Keyed<IAuthenticator>(RedisClusterAuthenticatorKey)
@@ -147,12 +156,16 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 (pi, ctx) => pi.Name.ToLowerInvariant() == "secretConfigurationProvider".ToLowerInvariant(),
                 (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(SecretsConfigurationProviderKey)));
 
+            builder.RegisterType<DefaultAzureCredentialProvider>()
+                  .As<IDefaultAzureCredentialProvider>()
+                  .SingleInstance();
+
             builder.Register(ctx =>
             {
                 var storageConfigResolver = ctx.Resolve<IConfigurationResolver<StorageConfiguration>>();
                 return storageConfigResolver.Resolve();
             }).As<StorageConfiguration>()
-            .SingleInstance();            
+            .SingleInstance();
 
             builder.RegisterType<StorageClientManager>()
                 .As<IStorageClientManager>()
@@ -170,7 +183,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 .Keyed<BaseConfigurationProvider>(StorageConfigurationProviderKey)
                 .As<BaseConfigurationProvider>()
                 .SingleInstance();
-        }       
+        }
 
         protected virtual void RegisterConfigurationProviders(ContainerBuilder builder)
         {
@@ -190,7 +203,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
             #endregion App Metadata Configuration
 
             builder.RegisterType<HttpClientFactory>()
-                .As<IHttpClientFactory>();           
+                .As<IHttpClientFactory>();
 
             builder.RegisterType<ConfigurationProviderChainBuilder>()
                 .As<IConfigurationProviderChainBuilder>()
@@ -214,7 +227,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
         }
 
         protected virtual void RegisterConfigurations(ContainerBuilder builder)
-        {   
+        {
         }
 
         protected virtual void RegisterAzureRegionUtility(ContainerBuilder builder)
@@ -287,9 +300,15 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
 
         protected virtual void RegisterHelpers(ContainerBuilder builder)
         {
+            #if DEBUG
             builder.RegisterType<DefaultAzureCredentialProvider>()
-               .As<IDefaultAzureCredentialProvider>()
-               .SingleInstance();
+                 .As<IDefaultAzureCredentialProvider>()
+                 .SingleInstance();
+            #else
+             builder.RegisterType<UserAssignedIdentityCredentialProvider>()
+                 .As<IDefaultAzureCredentialProvider>()
+                 .SingleInstance();
+            #endif
         }
     }
 }

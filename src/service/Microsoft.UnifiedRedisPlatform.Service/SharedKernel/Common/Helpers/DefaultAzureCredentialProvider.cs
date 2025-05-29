@@ -1,4 +1,5 @@
-﻿using Azure.Identity;
+﻿using Azure.Core;
+using Azure.Identity;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.UnifiedPlatform.Service.Common.Helpers
@@ -6,9 +7,9 @@ namespace Microsoft.UnifiedPlatform.Service.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class DefaultAzureCredentialProvider : IDefaultAzureCredentialProvider
     {
-        public DefaultAzureCredential GetDefaultAzureCredential()
+        public TokenCredential GetDefaultAzureCredential(string userManagedIdentity)
         {
-            return new DefaultAzureCredential();
+            return new VisualStudioCredential();
         }
     }
 }
