@@ -5,11 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CQRS" Version="1.0.1" />
+    <PackageReference Include="CQRS.Mediatr.Lite" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\sdk\Microsoft.UnifiedRedisPlatform.SDK\Core\Microsoft.UnifiedRedisPlatform.Core.csproj" />
     <ProjectReference Include="..\..\..\..\service\Microsoft.UnifiedRedisPlatform.Service\SharedKernel\Common\Microsoft.UnifiedPlatform.Service.Common.csproj" />
   </ItemGroup>
 
