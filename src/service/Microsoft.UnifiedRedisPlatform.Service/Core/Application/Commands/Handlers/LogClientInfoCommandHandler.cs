@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using AppInsights.EnterpriseTelemetry.Context;
 using Microsoft.UnifiedPlatform.Service.Common.Models;
-using AppInsights.EnterpriseTelemetry.Context;
 
 namespace Microsoft.UnifiedPlatform.Service.Application.Commands.Handlers
 {
