@@ -2,7 +2,6 @@ using System;
 using Autofac;
 using System.IO;
 using System.Reflection;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -32,7 +31,6 @@ namespace API
         {
             AddAuthentication(services);
             AddTelemetry(services, Configuration);
-            AddSwaggerDocumentation(services);
             services.AddControllers();
             RegisterDependencies(services, Configuration);
             return new AutofacServiceProvider(ApplicationContainer);
@@ -41,12 +39,6 @@ namespace API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/2020-5-1-beta/swagger.json", "Unified Redis Platform Administration API");
-                c.RoutePrefix = string.Empty;
-            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -90,35 +82,6 @@ namespace API
             containerBuilder.RegisterModule(new DependencyResolver(configuration));
             containerBuilder.Populate(services);
             ApplicationContainer = containerBuilder.Build();
-        }
-
-        protected virtual void AddSwaggerDocumentation(IServiceCollection services)
-        {
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("2020-5-1-beta", new OpenApiInfo
-                {
-                    Title = "Unifed Redis Platform Administration API",
-                    Version = "2020-5-1-beta",
-                    Description = "APIs for managing registered applications by partners' Admins",
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Field Experience Engineering Team",
-                        Email = "fxpswe@microsoft.com"
-                    }
-                });
-
-                try
-                {
-                    var documentationFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    var documentationPath = Path.Combine(AppContext.BaseDirectory, documentationFile);
-                    c.IncludeXmlComments(documentationPath);
-                }
-                catch
-                {
-                    // DO-Nothing if XML documentation fails
-                }
-            });
         }
     }
 }
