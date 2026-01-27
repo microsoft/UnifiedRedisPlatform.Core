@@ -1,5 +1,6 @@
 ﻿using System;
 using StackExchange.Redis;
+using StackExchange.Redis.Maintenance;
 using System.Collections.Generic;
 
 namespace Microsoft.UnifiedRedisPlatform.Core
@@ -13,6 +14,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
         public event EventHandler<EndPointEventArgs> ConfigurationChanged;
         public event EventHandler<EndPointEventArgs> ConfigurationChangedBroadcast;
         public event EventHandler<HashSlotMovedEventArgs> HashSlotMoved;
+        public event EventHandler<ServerMaintenanceEvent> ServerMaintenanceEvent;
 
         private void SetupEventHandlers()
         {
@@ -53,6 +55,10 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                 connection.HashSlotMoved += (sender, e) => HashSlotMoved(sender, e);
                 connection.HashSlotMoved += (sender, e) => _logger.LogEvent("Redis:HashSlotMoved", 0.0,
                     new Dictionary<string, string>() { { "OldEndpoint", e.OldEndPoint.ToString() }, { "NewEndpoint", e.NewEndPoint.ToString() }, { "HashSlot", e.HashSlot.ToString() } });
+
+                connection.ServerMaintenanceEvent += (sender, e) => ServerMaintenanceEvent?.Invoke(sender, e);
+                connection.ServerMaintenanceEvent += (sender, e) => _logger.LogEvent("Redis:ServerMaintenanceEvent", 0.0,
+                    new Dictionary<string, string>() { { "RawMessage", e.RawMessage } });
             }
         }
     }

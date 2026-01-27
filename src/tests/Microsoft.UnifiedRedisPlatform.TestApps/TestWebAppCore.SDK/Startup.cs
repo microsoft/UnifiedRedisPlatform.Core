@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Caching.UnifiedRedisPlatform;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +25,7 @@ namespace TestWebAppCore.SDK
                 options.Application = Configuration.GetValue<string>("URP:Application");
                 options.AppSecret = Configuration.GetValue<string>("URP:ApplicationSecret");
                 options.PreferredLocation = Configuration.GetValue<string>("URP:Location");
+                options.ManagedIdentityClientId = Configuration.GetValue<string>("URP:ManagedIdentityClientId");
             });
             services.AddControllers();
         }

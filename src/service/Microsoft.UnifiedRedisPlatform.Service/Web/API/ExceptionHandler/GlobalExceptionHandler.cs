@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using Microsoft.AspNetCore.Http;
-using CQRS.Mediatr.Lite.Exceptions;
+using Microsoft.CQRS.Exceptions;
 using AppInsights.EnterpriseTelemetry;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
@@ -13,10 +13,10 @@ namespace Microsoft.UnifiedRedisPlatform.Service.API.ExceptionHandler
 {
     public class GlobalExceptionHandler : IGlobalExceptionHandler
     {
-        private readonly ILogger _logger;
+        private readonly AppInsights.EnterpriseTelemetry.ILogger _logger;
         private readonly string _correlationIdHeader;
 
-        public GlobalExceptionHandler(ILogger logger, IConfiguration configuration)
+        public GlobalExceptionHandler(AppInsights.EnterpriseTelemetry.ILogger logger, IConfiguration configuration)
         {
             _logger = logger;
             _correlationIdHeader = configuration.GetValue<string>("Application:CorrelationIdHeaderKey");

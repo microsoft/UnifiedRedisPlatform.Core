@@ -35,7 +35,7 @@ namespace Microsoft.UnifiedPlatform.Service.Redis
 
         private async Task StreamLogsFromRedisConnection(string redisConnectionString, string listKey, Channel<List<Log>> logsChannel, int batchSize, bool commitLog, bool closeChannel)
         {
-            var connection = _redisConnectionManager.CreateConnection(redisConnectionString);
+            var connection = await _redisConnectionManager.CreateConnectionAsync(redisConnectionString);
             var database = connection.GetDatabase();
             ChannelWriter<List<Log>> logsChannelWriter = logsChannel.Writer;
 

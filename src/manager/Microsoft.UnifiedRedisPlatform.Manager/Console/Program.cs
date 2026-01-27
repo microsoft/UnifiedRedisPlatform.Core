@@ -20,6 +20,7 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
         private static string _appName;
         private static string _appSecret;
         private static string _location;
+        private static string _managedIdentityClientId;
         private static UnifiedConnectionMultiplexer _mux;
         private static IUnifiedDatabase _database;
         private static int _mode = AdvancedMode;
@@ -105,6 +106,7 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
                         AppName = _appName,
                         AppSecret = _appSecret,
                         Region = _location,
+                        ManagedIdentityClientId = _managedIdentityClientId,
                         ConnectionRetryProtocol = connectionTimeout > 0 && connectionMaxRetry > 0 ? new RetryProtocol()
                         {
                             TimeoutInMs = connectionTimeout > 0 ? connectionTimeout : RetryProtocol.GetDefaultConnectionProtocol().TimeoutInMs,
@@ -135,7 +137,7 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
 
             if (_mux == null)
             {
-                _mux = UnifiedConnectionMultiplexer.Connect(_clusterName, _appName, _appSecret, preferredLocation: _location) as UnifiedConnectionMultiplexer;
+                _mux = UnifiedConnectionMultiplexer.Connect(_clusterName, _appName, _appSecret, managedIdentityClientId: _managedIdentityClientId, preferredLocation: _location) as UnifiedConnectionMultiplexer;
             }
 
             _database = _mux.GetDatabase() as IUnifiedDatabase;
@@ -219,6 +221,7 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
             _appName = _configuration["AppName"];
             _appSecret = _configuration["AppSecret"];
             _location = _configuration["AppLocation"];
+            _managedIdentityClientId = _configuration["ManagedIdentityClientId"];
 
             Console.WriteLine("Default configurations received.");
         }
@@ -238,6 +241,9 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
 
             Console.Write("Region: ");
             _location = Console.ReadLine();
+
+            Console.Write("Managed Identity Client ID (leave empty for local debugging): ");
+            _managedIdentityClientId = Console.ReadLine();
         }
 
         private static void ShowOperations()
@@ -322,7 +328,9 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
                 if (choice.KeyChar.ToString().ToLower() == "e")
                     return;
 
+#pragma warning disable CS0618 // Perf issues are acceptable in Management Console
                 var keys = AsyncMode ? _mux.GetKeysAsync().Result : _mux.GetKeys();
+#pragma warning restore CS0618
                 if (!keys.Any())
                     Console.WriteLine("No keys found in cache");
                 else
@@ -387,10 +395,12 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
                 if (choice.KeyChar.ToString().ToLower() == "e")
                     return;
 
+#pragma warning disable CS0618 // Perf issues are acceptable in Management Console
                 if (AsyncMode)
                     _mux.FlushAsync().Wait();
                 else
                     _mux.FlushAsync();
+#pragma warning restore CS0618
 
                 Console.WriteLine("Cache flushed");
             }
@@ -415,10 +425,12 @@ namespace Microsoft.UnifiedRedisPlatform.ManagementConsole
                 if (choice.KeyChar.ToString().ToLower() == "e")
                     return;
 
+#pragma warning disable CS0618 // Perf issues are acceptable in Management Console
                 if (AsyncMode)
                     _mux.FlushSecondaryAsync().Wait();
                 else
                     _mux.FlushSecondary();
+#pragma warning restore CS0618
 
                 Console.WriteLine("Cache flushed");
             }

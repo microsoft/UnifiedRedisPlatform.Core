@@ -6,7 +6,7 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Commands
 {
     public class FlushKeysCommand : Command<KeysResult>
     {
-        public override string DisplayName => "Flush Application Command";
+        public override string DisplayName => "Flush Keys Command";
 
         private readonly string _id;
         public override string Id => _id;
@@ -16,7 +16,7 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Commands
         public string SearchText { get; set; }
         public bool DeleteSecondary { get; set; }
 
-        public FlushKeysCommand(string cluster, string application, string searchText, bool deleteSecondary = false)
+        public FlushKeysCommand(string cluster, string application, string searchText, bool deleteSecondary)
         {
             _id = Guid.NewGuid().ToString();
             Cluster = cluster;
@@ -25,20 +25,24 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Commands
             DeleteSecondary = deleteSecondary;
         }
 
-        public FlushKeysCommand(string cluster, string application)
-            : this(cluster, application, null)
+        public FlushKeysCommand(string cluster, string application, string searchText)
+            : this(cluster, application, searchText, false)
         { }
 
         public override bool Validate(out string ValidationErrorMessage)
         {
             ValidationErrorMessage = null;
-            
             if (string.IsNullOrWhiteSpace(Cluster))
-                ValidationErrorMessage += "Cluster name cannot be empty.";
+            {
+                ValidationErrorMessage = "Cluster is not provided";
+                return false;
+            }
             if (string.IsNullOrWhiteSpace(Application))
-                ValidationErrorMessage += "Application name cannot be empty.";
-            
-            return string.IsNullOrWhiteSpace(ValidationErrorMessage);
+            {
+                ValidationErrorMessage = "Application is not provided";
+                return false;
+            }
+            return true;
         }
     }
 }

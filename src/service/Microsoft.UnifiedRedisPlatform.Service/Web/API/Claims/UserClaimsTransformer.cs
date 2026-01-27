@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using CQRS.Mediatr.Lite;
+using Microsoft.CQRS;
 using System;
 using System.Collections.Generic;
 using System.Linq;

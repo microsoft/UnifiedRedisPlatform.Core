@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using CQRS.Mediatr.Lite;
+using Microsoft.CQRS;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;

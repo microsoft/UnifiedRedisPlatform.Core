@@ -1,0 +1,12 @@
+﻿{
+  "profiles": {
+    "Microsoft.UnifiedRedisPlatform.Service.Function": {
+      "commandName": "Project",
+      "commandLineArgs": "start --csharp",
+      "environmentVariables": {
+        "AZURE_FUNCTIONS_ENVIRONMENT": "Development",
+        "WEBSITE_SITE_NAME": "UnifiedRedisPlatform-Local"
+      }
+    }
+  }
+}

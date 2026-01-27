@@ -1,5 +1,5 @@
 ﻿using System;
-using CQRS.Mediatr.Lite;
+using Microsoft.CQRS;
 using Microsoft.UnifiedPlatform.Service.Common.Models;
 
 namespace Microsoft.UnifiedPlatform.Service.Application.Queries
@@ -14,11 +14,13 @@ namespace Microsoft.UnifiedPlatform.Service.Application.Queries
         public string ClusterName { get; }
         public string AppName { get; }
         public string PreferredLocation { get; set; }
+        public bool UseManagedIdentity { get; set; }
 
-        public GetClusterConfigurationQuery(string clusterName, string appName, string preferredLocation)
+        public GetClusterConfigurationQuery(string clusterName, string appName, string preferredLocation, bool useManagedIdentity = false)
             :this(clusterName, appName)
         {
             PreferredLocation = preferredLocation;
+            UseManagedIdentity = useManagedIdentity;
         }
 
         public GetClusterConfigurationQuery(string clusterName, string appName)

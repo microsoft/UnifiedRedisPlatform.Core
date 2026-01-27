@@ -7,6 +7,8 @@ using Microsoft.UnifiedRedisPlatform.Core.Services;
 using Microsoft.UnifiedRedisPlatform.Core.Constants;
 using Microsoft.UnifiedRedisPlatform.Core.Services.Models;
 using Microsoft.UnifiedRedisPlatform.Core.Services.Interfaces;
+using Azure.Core;
+using Azure.Identity;
 
 namespace Microsoft.UnifiedRedisPlatform.Core
 {
@@ -16,15 +18,39 @@ namespace Microsoft.UnifiedRedisPlatform.Core
         private readonly string _clusterName;
         private readonly string _appName;
         private readonly string _appSecret;
+        private readonly string _managedIdentityClientId;
         private readonly IUnifiedRedisPlatformServiceClient _urpClient;
+        private readonly TokenCredential _tokenCredential;
+        private readonly bool _useManagedIdentity;
+        private static readonly string[] RedisScopes = new[] { "https://redis.azure.com/.default" };
 
-        public RedisConnectionBuilder(string serviceEndpoint, string clusterName, string appName, string appSecret, string preferredLocation = null)
+        public RedisConnectionBuilder(string serviceEndpoint, string clusterName, string appName, string appSecret, string preferredLocation = null, string managedIdentityClientId = null)
         {
             _clusterName = clusterName;
             _appName = appName;
             _appSecret = appSecret;
+            _managedIdentityClientId = managedIdentityClientId;
             _serviceEndpoint = !string.IsNullOrWhiteSpace(serviceEndpoint) ? serviceEndpoint : Constant.OperationApi.DefaultUrl;
-            _urpClient = new UnifiedRedisPlatformServiceClient(_serviceEndpoint, _clusterName, _appName, _appSecret, preferredLocation);
+            
+            // Set MI flag BEFORE creating the service client
+            _useManagedIdentity = !string.IsNullOrWhiteSpace(managedIdentityClientId);
+            _urpClient = new UnifiedRedisPlatformServiceClient(_serviceEndpoint, _clusterName, _appName, _appSecret, preferredLocation, _useManagedIdentity);
+            
+            if (_useManagedIdentity)
+            {
+                _tokenCredential = CreateTokenCredential(managedIdentityClientId);
+            }
+        }
+
+        private static TokenCredential CreateTokenCredential(string managedIdentityClientId)
+        {
+#if DEBUG
+            // Use AzureCliCredential for local development (works with VS Code + az login)
+            return new AzureCliCredential();
+#else
+            // Use User-Assigned Managed Identity for production
+            return new ManagedIdentityCredential(managedIdentityClientId);
+#endif
         }
 
         public async Task<UnifiedConfigurationServerOptions> GetConfiguration()
@@ -46,13 +72,13 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                 Region = clusterConfiguration.PrimaryRedisRegion,
                 WritePolicy = applicationConfiguration.WritePolicy
             };
-            unifiedConfiguration.BaseConfigurationOptions = CreateRedisConfigurationOption(primaryConnectionString, applicationConfiguration, isSecondaryConnection: false);
+            unifiedConfiguration.BaseConfigurationOptions = await CreateRedisConfigurationOptionAsync(primaryConnectionString, applicationConfiguration, isSecondaryConnection: false);
 
             if (clusterConfiguration.AreSecondaryConnectionsPresent)
             {
                 foreach (var secondaryConnectionString in clusterConfiguration.SecondaryRedisConnectionStrings)
                 {
-                    unifiedConfiguration.SecondaryConfigurationsOptions.Add(CreateRedisConfigurationOption(secondaryConnectionString, applicationConfiguration, isSecondaryConnection: true));
+                    unifiedConfiguration.SecondaryConfigurationsOptions.Add(await CreateRedisConfigurationOptionAsync(secondaryConnectionString, applicationConfiguration, isSecondaryConnection: true));
                 }
 
             }
@@ -81,14 +107,14 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                 currentConfiguration.DiagnosticSettings = applicationPreferredConfiguration?.DiagnosticSettings;
 
             currentConfiguration.BaseConfigurationOptions =
-                CreateRedisConfigurationOptionsFromExistingConfigurations(connectionString, currentConfiguration.BaseConfigurationOptions, applicationPreferredConfiguration, isSecondaryConnection: false);
+                await CreateRedisConfigurationOptionsFromExistingConfigurationsAsync(connectionString, currentConfiguration.BaseConfigurationOptions, applicationPreferredConfiguration, isSecondaryConnection: false);
 
             if (clusterPreferredConfiguration.AreSecondaryConnectionsPresent)
             {
                 currentConfiguration.SecondaryConfigurationsOptions = new List<ConfigurationOptions>(); // Secondary connections are added from settings
                 foreach(var secondaryConnection in clusterPreferredConfiguration.SecondaryRedisConnectionStrings)
                 {
-                    currentConfiguration.SecondaryConfigurationsOptions.Add(CreateRedisConfigurationOption(secondaryConnection, applicationPreferredConfiguration, isSecondaryConnection: true));
+                    currentConfiguration.SecondaryConfigurationsOptions.Add(await CreateRedisConfigurationOptionAsync(secondaryConnection, applicationPreferredConfiguration, isSecondaryConnection: true));
                 }
             }
 
@@ -96,7 +122,22 @@ namespace Microsoft.UnifiedRedisPlatform.Core
         }
 
         #region Private Builders
-        private ConfigurationOptions CreateRedisConfigurationOption(string connectionString, ApplicationConfiguration applicationConfiguration, bool isSecondaryConnection)
+        /// <summary>
+        /// Gets an access token for Redis using Azure Managed Identity.
+        /// Only called when _useManagedIdentity is true.
+        /// </summary>
+        private async Task<string> GetRedisAccessTokenAsync()
+        {
+            if (!_useManagedIdentity || _tokenCredential == null)
+            {
+                return null;
+            }
+            var tokenRequestContext = new TokenRequestContext(RedisScopes);
+            var accessToken = await _tokenCredential.GetTokenAsync(tokenRequestContext, default);
+            return accessToken.Token;
+        }
+
+        private async Task<ConfigurationOptions> CreateRedisConfigurationOptionAsync(string connectionString, ApplicationConfiguration applicationConfiguration, bool isSecondaryConnection)
         {
             ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
             options.ClientName = $"{_appName}-{Guid.NewGuid().ToString()}";
@@ -105,6 +146,14 @@ namespace Microsoft.UnifiedRedisPlatform.Core
 
             options.AbortOnConnectFail = false;
             options.Ssl = true;
+
+            // Use Managed Identity token for Redis authentication if configured
+            // Otherwise, keep the password from the connection string (legacy behavior)
+            if (_useManagedIdentity)
+            {
+                var token = await GetRedisAccessTokenAsync();
+                options.Password = token;
+            }
 
             options.ReconnectRetryPolicy = applicationConfiguration.ConnectionPreference.ConnectionRetryProtocol;
             options.ConnectRetry = applicationConfiguration.ConnectionPreference.ConnectionRetryProtocol.MaxRetryCount;
@@ -121,7 +170,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             return options;
         }
 
-        private ConfigurationOptions CreateRedisConfigurationOptionsFromExistingConfigurations(string connectionString, ConfigurationOptions existingConfiguration, ApplicationConfiguration applicationConfiguration, bool isSecondaryConnection)
+        private async Task<ConfigurationOptions> CreateRedisConfigurationOptionsFromExistingConfigurationsAsync(string connectionString, ConfigurationOptions existingConfiguration, ApplicationConfiguration applicationConfiguration, bool isSecondaryConnection)
         {
             var serverConfiguration = ConfigurationOptions.Parse(connectionString);
 
@@ -131,7 +180,6 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             }
             else
             {
-                existingConfiguration.Password = serverConfiguration.Password;
                 existingConfiguration.EndPoints.Clear();
                 foreach (var endpoint in serverConfiguration.EndPoints)
                 {
@@ -145,6 +193,18 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                 existingConfiguration.ConfigurationChannel = serverConfiguration.ConfigurationChannel;
                 existingConfiguration.DefaultVersion = serverConfiguration.DefaultVersion;
                 existingConfiguration.ResolveDns = serverConfiguration.ResolveDns;
+            }
+
+            // Use Managed Identity token for Redis authentication if configured
+            // Otherwise, keep the password from the connection string (legacy behavior)
+            if (_useManagedIdentity)
+            {
+                var token = await GetRedisAccessTokenAsync();
+                existingConfiguration.Password = token;
+            }
+            else
+            {
+                existingConfiguration.Password = serverConfiguration.Password;
             }
 
             existingConfiguration.AllowAdmin =

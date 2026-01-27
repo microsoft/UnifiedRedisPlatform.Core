@@ -1,4 +1,4 @@
-{
+﻿{
     "AppName": "FXP-ConfigSvc-SIT",
     "SupportContact": "fxpswe@microsoft.com",
     "RedisCachePrefix": "fcsit",

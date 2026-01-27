@@ -8,19 +8,15 @@ using Microsoft.UnifiedRedisPlatform.Core.Exceptions;
 
 namespace Microsoft.UnifiedRedisPlatform.Core
 {
+    /// <summary>
+    /// Configuration options for connecting to URP via the service endpoint.
+    /// Use this when you want the SDK to fetch Redis configuration from the URP service.
+    /// </summary>
     public class UnifiedConfigurationServerOptions : UnifiedConfigurationOptions
     {
         public UnifiedConfigurationServerOptions() { }
 
-        
-        public string AppSecret { get; set; }
-
-        private string _serviceEndpoint;
-        public string ServiceEndpoint
-        {
-            get => !string.IsNullOrWhiteSpace(_serviceEndpoint) && Uri.IsWellFormedUriString(_serviceEndpoint, UriKind.Absolute) ? _serviceEndpoint : Constant.OperationApi.DefaultUrl;
-            set => _serviceEndpoint = value;
-        }
+        // AppSecret, ManagedIdentityClientId, and ServiceEndpoint are inherited from base class
 
         public override object Clone()
         {
@@ -28,14 +24,16 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             {
                 AppName = this.AppName,
                 AppSecret = this.AppSecret,
+                ManagedIdentityClientId = this.ManagedIdentityClientId,
                 WritePolicy = this.WritePolicy,
-                BaseConfigurationOptions = this.BaseConfigurationOptions.Clone(),
+                BaseConfigurationOptions = this.BaseConfigurationOptions?.Clone(),
                 ClusterName = this.ClusterName,
-                ConnectionRetryProtocol = (RetryProtocol)this.ConnectionRetryProtocol.Clone(),
-                DiagnosticSettings = (LogConfiguration)this.DiagnosticSettings.Clone(),
+                ConnectionRetryProtocol = this.ConnectionRetryProtocol != null ? (RetryProtocol)this.ConnectionRetryProtocol.Clone() : null,
+                DiagnosticSettings = this.DiagnosticSettings != null ? (LogConfiguration)this.DiagnosticSettings.Clone() : null,
                 KeyPrefix = this.KeyPrefix,
                 Logger = this.Logger,
-                OperationsRetryProtocol = (RetryProtocol)this.OperationsRetryProtocol.Clone(),
+                OperationsRetryProtocol = this.OperationsRetryProtocol != null ? (RetryProtocol)this.OperationsRetryProtocol.Clone() : null,
+                Region = this.Region,
                 SecondaryConfigurationsOptions = this.SecondaryConfigurationsOptions.Any() ?
                     this.SecondaryConfigurationsOptions.Select(options => options.Clone()).ToList()
                     : new List<ConfigurationOptions>()

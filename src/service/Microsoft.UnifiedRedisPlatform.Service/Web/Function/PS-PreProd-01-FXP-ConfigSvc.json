@@ -1,4 +1,4 @@
-{
+﻿{
     "AppName": "FXP-ConfigSvc",
     "SupportContact": "fxpswe@microsoft.com",
     "RedisCachePrefix": "fcfg",

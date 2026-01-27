@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using StackExchange.Redis;
 using System.Threading.Tasks;
@@ -39,7 +40,9 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             }
         }
 
+#pragma warning disable CS0618 // IncludeDetailInExceptions is obsolete but needed for interface compatibility
         public bool IncludeDetailInExceptions { get => _baseConnectionMux.IncludeDetailInExceptions; set => _baseConnectionMux.IncludeDetailInExceptions = value; }
+#pragma warning restore CS0618
         public int StormLogThreshold { get => _baseConnectionMux.StormLogThreshold; set => _baseConnectionMux.StormLogThreshold = value; }
 
         public string AppSecret { get; }
@@ -80,6 +83,8 @@ namespace Microsoft.UnifiedRedisPlatform.Core
 
         public IServer GetServer(EndPoint endpoint, object asyncState = null) => _baseConnectionMux.GetServer(endpoint, asyncState);
 
+        public IServer[] GetServers() => _baseConnectionMux.GetServers();
+
         public string GetStatus() => _baseConnectionMux.GetStatus();
 
         public void GetStatus(TextWriter log) => _baseConnectionMux.GetStatus(log);
@@ -103,6 +108,18 @@ namespace Microsoft.UnifiedRedisPlatform.Core
         public T Wait<T>(Task<T> task) => _baseConnectionMux.Wait<T>(task);
 
         public void WaitAll(params Task[] tasks) => _baseConnectionMux.WaitAll(tasks);
+
+        public void AddLibraryNameSuffix(string suffix) => _baseConnectionMux.AddLibraryNameSuffix(suffix);
+
+        public ValueTask DisposeAsync()
+        {
+            var disposeTasks = new List<ValueTask>();
+            foreach (var connection in GetAllConnectionMultiplexers())
+            {
+                disposeTasks.Add(connection.DisposeAsync());
+            }
+            return new ValueTask(Task.WhenAll(disposeTasks.Select(vt => vt.AsTask())));
+        }
         #endregion Connection Mux Methods
     }
 }

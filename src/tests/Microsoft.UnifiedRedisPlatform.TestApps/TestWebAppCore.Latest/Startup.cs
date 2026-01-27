@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,6 +32,7 @@ namespace TestWebAppCore.Latest
                 options.Application = Configuration.GetValue<string>("URP:Application");
                 options.AppSecret = Configuration.GetValue<string>("URP:ApplicationSecret");
                 options.PreferredLocation = Configuration.GetValue<string>("URP:Location");
+                options.ManagedIdentityClientId = Configuration.GetValue<string>("URP:ManagedIdentityClientId");
             });
             services.AddControllers();
         }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using CQRS.Mediatr.Lite;
+using Microsoft.CQRS;
 using System.Threading.Tasks;
 using AppInsights.EnterpriseTelemetry;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using AppInsights.EnterpriseTelemetry.Context;
 using Microsoft.UnifiedPlatform.Service.Common.Models;
-using AppInsights.EnterpriseTelemetry.Context;
 
 namespace Microsoft.UnifiedPlatform.Service.Application.Commands.Handlers
 {

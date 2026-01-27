@@ -247,9 +247,14 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.API.Dependency
 
         protected virtual void RegisterRequestHandlerResolver(ContainerBuilder builder)
         {
-            builder.RegisterType<UnifiedConnectionMultiplexerFactory>()
-                .As<IUnifiedConnectionMultiplexerFactory>()
-                .SingleInstance();
+            builder.Register(ctx =>
+            {
+                var config = ctx.Resolve<IConfiguration>();
+                var managedIdentityClientId = config["ManagedIdentityClientId"];
+                return new UnifiedConnectionMultiplexerFactory(managedIdentityClientId);
+            })
+            .As<IUnifiedConnectionMultiplexerFactory>()
+            .SingleInstance();
 
             builder.Register(ctx =>
             {
