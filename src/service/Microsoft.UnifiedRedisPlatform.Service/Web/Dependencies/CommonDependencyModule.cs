@@ -156,10 +156,6 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 (pi, ctx) => pi.Name.ToLowerInvariant() == "secretConfigurationProvider".ToLowerInvariant(),
                 (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(SecretsConfigurationProviderKey)));
 
-            builder.RegisterType<DefaultAzureCredentialProvider>()
-                  .As<IDefaultAzureCredentialProvider>()
-                  .SingleInstance();
-
             builder.Register(ctx =>
             {
                 var storageConfigResolver = ctx.Resolve<IConfigurationResolver<StorageConfiguration>>();

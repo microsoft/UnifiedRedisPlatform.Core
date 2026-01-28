@@ -10,5 +10,6 @@ namespace Microsoft.UnifiedPlatform.Service.Common.Configuration
         public TimeSpan BackoffInternal { get; set; }
         public int MaxAttempt { get; set; }
         public string ConfigurationTableName { get; set; }
+        public string UserAssignedClientId { get; set; }
     }
 }
