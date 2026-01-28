@@ -28,7 +28,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.API.Controllers
             var clusterName = GetClusterFromClaims();
             var appName = GetAppFromClaims();
             var preferredLocaltion = GetPreferredLocation();
-            var useManagedIdentity = Request.Headers["x-use-managed-identity"]?.FirstOrDefault()?.Equals("true", System.StringComparison.OrdinalIgnoreCase) ?? false;
+            var useManagedIdentity = Request.Headers["x-use-managed-identity"].FirstOrDefault()?.Equals("true", System.StringComparison.OrdinalIgnoreCase) ?? false;
 
             var query = new GetClusterConfigurationQuery(clusterName, appName, preferredLocaltion, useManagedIdentity)
             {

@@ -1,21 +1,39 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package >
   <metadata>
     <id>Microsoft.UnifiedRedisPlatform.Core</id>
-    <version>1.2.0-rc-1.0</version>
+    <version>1.5.0</version>
     <title>Microsoft.UnifiedRedisPlatform.Core</title>
     <authors>Pratik Bhattacharya</authors>
     <owners>Microsoft</owners>
     <projectUrl>https://dev.azure.com/MicrosoftIT/OneITVSO/_workitems/edit/4288461</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Lighweight library to connect to a common Redis Cache from multiple applications</description>
-    <releaseNotes>Added methods for automatically adding absolute and sliding expiring keys</releaseNotes>
+    <releaseNotes>
+v1.5.0:
+- Added Managed Identity support for Manager API
+- Improved configuration handling for ManagedIdentityClientId
+- Code quality improvements and file encoding standardization
+
+v1.4.0:
+- Added Managed Identity (MI) support for Azure Redis Cache authentication (opt-in via ManagedIdentityClientId)
+- Upgraded to Microsoft.Azure.StackExchangeRedis 3.2.1 (brings StackExchange.Redis 2.8.x)
+- Added 120+ new IDatabase methods from SE.Redis 2.8.x
+- Added ServerMaintenanceEvent for Azure Cache maintenance notifications
+- Added ConnectAsync() method for async connection initialization
+- Updated Azure.Identity to 1.17.1 (fixed deprecated 1.14.0)
+- Updated Newtonsoft.Json to 13.0.3
+- Backward compatible: existing AccessKey authentication works as-is
+    </releaseNotes>
     <copyright>Copyright 2019</copyright>
-    <tags>Unified Redis Platform URP</tags>
+    <tags>Unified Redis Platform URP Managed Identity Azure</tags>
     <dependencies>
       <group targetFramework="netstandard2.0">
-        <dependency id="Newtonsoft.Json" version="12.0.2" />
-        <dependency id="StackExchange.Redis" version="2.0.601" />
+        <dependency id="Newtonsoft.Json" version="13.0.3" />
+        <dependency id="Microsoft.Azure.StackExchangeRedis" version="3.2.1" />
+        <dependency id="Azure.Identity" version="1.17.1" />
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="8.0.0" />
+        <dependency id="StackExchange.Redis" version="2.8.24" />
       </group>
     </dependencies>
   </metadata>
