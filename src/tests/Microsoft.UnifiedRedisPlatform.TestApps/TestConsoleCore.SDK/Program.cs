@@ -19,6 +19,8 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
         private static string _clusterName;
         private static string _appName;
         private static string _appSecret;
+        private static string _location;
+        private static string _managedIdentityClientId;
         private static UnifiedConnectionMultiplexer _mux;
         private static IDatabase _database;
         private static int _mode = AdvancedMode;
@@ -80,6 +82,8 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
                         ClusterName = _clusterName,
                         AppName = _appName,
                         AppSecret = _appSecret,
+                        ManagedIdentityClientId = _managedIdentityClientId,
+                        Region = _location,
                         ConnectionRetryProtocol = connectionTimeout > 0 && connectionMaxRetry > 0 ? new RetryProtocol()
                         {
                             TimeoutInMs = connectionTimeout > 0 ? connectionTimeout : RetryProtocol.GetDefaultConnectionProtocol().TimeoutInMs,
@@ -113,7 +117,7 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
             if (_mux == null)
             {
                 //_mux = UnifiedConnectionMultiplexer.Connect(_clusterName, _appName, _appSecret, serviceEndpoint: "https://localhost:44316") as UnifiedConnectionMultiplexer;
-                _mux = UnifiedConnectionMultiplexer.Connect(_clusterName, _appName, _appSecret) as UnifiedConnectionMultiplexer;
+                _mux = UnifiedConnectionMultiplexer.Connect(_clusterName, _appName, _appSecret, managedIdentityClientId: _managedIdentityClientId, preferredLocation: _location) as UnifiedConnectionMultiplexer;
             }
 
             _database = _mux.GetDatabase();
@@ -173,20 +177,22 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
 
         private static void SetupDefaultAppDetails()
         {
-            //Console.WriteLine();
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //Console.WriteLine("Please wait while we get the default configuration...");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Please wait while we get the default configuration...");
 
-            //_clusterName = _configuration["ClusterName"];
-            //_appName = _configuration["ClientName"];
+            _clusterName = _configuration["ClusterName"];
+            _appName = _configuration["AppName"];
+            _appSecret = _configuration["AppSecret"];
+            _location = _configuration["AppLocation"];
+            _managedIdentityClientId = _configuration["ManagedIdentityClientId"];
 
-            //var keyVaultName = _configuration["KeyVaultName"];
-            //var secretsProvider = new SecretProvider(keyVaultName);
-
-            //var appSecretLocation = _configuration["AppSecretName"];
-            //_appSecret = secretsProvider.GetSecret(appSecretLocation).Result;
-
-            //Console.WriteLine("Default configurations received.");
+            Console.WriteLine("Default configurations received.");
+            if (!string.IsNullOrWhiteSpace(_managedIdentityClientId))
+            {
+                Console.WriteLine("  Using Managed Identity authentication");
+                Console.WriteLine($"  MI Client ID: {_managedIdentityClientId}");
+            }
         }
 
         private static void SetAppDetails()
@@ -199,8 +205,14 @@ namespace Microsoft.UnifiedRedisPlatform.TestConsoleCore.Latest
             Console.Write("App Name: ");
             _appName = Console.ReadLine();
 
-            Console.Write("App Secret: ");
+            Console.Write("App Secret (leave blank for MI auth): ");
             _appSecret = Console.ReadLine();
+
+            Console.Write("Region: ");
+            _location = Console.ReadLine();
+
+            Console.Write("Managed Identity Client ID (leave blank for VisualStudioCredential): ");
+            _managedIdentityClientId = Console.ReadLine();
         }
 
         private static void ShowOperations()

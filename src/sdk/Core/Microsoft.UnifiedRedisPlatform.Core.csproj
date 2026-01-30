@@ -3,24 +3,32 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.2</Version>
+    <Version>1.5.0</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Pratik Bhattacharya</Authors>
     <Company>Microsoft</Company>
     <Product>Unified Redis Platform</Product>
     <Description>Lighweight library to connect to a common Redis Cache from multiple applications</Description>
-    <PackageReleaseNotes>Fixed get keys by pattern</PackageReleaseNotes>
-    <PackageId>UnifiedRedisPlatform</PackageId>
+    <PackageReleaseNotes>
+v1.3.0:
+- Added Managed Identity (MI) support for Azure Redis Cache authentication
+- Upgraded to Microsoft.Azure.StackExchangeRedis 3.2.1
+- Added ConnectAsync() method for async connection initialization
+- Updated Azure.Identity to 1.17.1
+- Backward compatible with existing AccessKey authentication
+    </PackageReleaseNotes>
+    <PackageId>Microsoft.UnifiedRedisPlatform.Core</PackageId>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>redis; azure; unifed redis platform; unified redis framework; redis cache; azure cache; azure redis cache; azure cost</PackageTags>
+    <PackageTags>redis; azure; unifed redis platform; unified redis framework; redis cache; azure cache; azure redis cache; managed identity</PackageTags>
     <PackageProjectUrl>https://github.com/microsoft/UnifiedRedisPlatform.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/UnifiedRedisPlatform.Core.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+    <PackageReference Include="Azure.Identity" Version="1.17.1" />
+    <PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

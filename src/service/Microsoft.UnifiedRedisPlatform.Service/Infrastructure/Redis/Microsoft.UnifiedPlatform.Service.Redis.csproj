@@ -6,9 +6,10 @@
 
   <ItemGroup>
     <PackageReference Include="AppInsights.EnterpriseTelemetry" Version="1.0.2" />
-    <PackageReference Include="Azure.Identity" Version="1.15.0" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.73.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
+    <PackageReference Include="Azure.Identity" Version="1.17.1" />
+    <PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.78.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
 
   </ItemGroup>
 

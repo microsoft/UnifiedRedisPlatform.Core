@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Autofac;
 using System.IO;
 using System.Reflection;
@@ -71,7 +71,7 @@ namespace API
 
         protected virtual void AddTelemetry(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddEnterpriseLogger(configuration);
+            services.AddEnterpriseTelemetry(configuration);
             services.AddSingleton<IGlobalExceptionHandler, UnauthorizedUserExceptionHandler>();
             services.AddSingleton<IGlobalExceptionHandler, GenericExceptionHandler>();
         }

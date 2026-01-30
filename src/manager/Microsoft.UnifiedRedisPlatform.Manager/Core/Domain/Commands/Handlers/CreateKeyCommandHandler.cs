@@ -5,7 +5,6 @@ using AppInsights.EnterpriseTelemetry;
 using AppInsights.EnterpriseTelemetry.Context;
 using Microsoft.UnifiedPlatform.Service.Common.Configuration;
 using Microsoft.UnifiedPlatform.Service.Common.Authentication;
-using AppInsights.EnterpriseTelemetry;
 
 namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Commands.Handlers
 {

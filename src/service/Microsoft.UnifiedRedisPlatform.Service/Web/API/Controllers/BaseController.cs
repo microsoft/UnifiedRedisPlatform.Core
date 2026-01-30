@@ -49,10 +49,7 @@ namespace Microsoft.UnifiedRedisPlatform.Service.API.Controllers
 
         protected void AddHeaderValue(string headerKey, string headerValue)
         {
-            if (Request.Headers.ContainsKey(headerKey))
-                Request.Headers[headerKey] = headerValue;
-            else
-                Request.Headers.Add(headerKey, new Extensions.Primitives.StringValues(headerValue));
+            Request.Headers[headerKey] = headerValue;
         }
 
         protected string GetSingleHeaderValue(string headerKey)

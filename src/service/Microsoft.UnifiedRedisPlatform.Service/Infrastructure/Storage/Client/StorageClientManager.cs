@@ -19,11 +19,12 @@ namespace Microsoft.UnifiedPlatform.Storage.Client
         {
             _defaultAzureCredentialProvider = defaultAzureCredentialProvider;
             var storageaccountName = configuration?.StorageAccountName;
+            var userAssignedClientId = configuration?.UserAssignedClientId;
            
             // Create BlobServiceClient with managed identity
-            _blobServiceClient = new BlobServiceClient(new Uri(string.Format("https://{0}.blob.core.windows.net", storageaccountName)), _defaultAzureCredentialProvider.GetDefaultAzureCredential());
+            _blobServiceClient = new BlobServiceClient(new Uri(string.Format("https://{0}.blob.core.windows.net", storageaccountName)), _defaultAzureCredentialProvider.GetDefaultAzureCredential(userAssignedClientId));
             // Create TableServiceClient with managed identity
-            _tableServiceClient = new TableServiceClient(new Uri(string.Format("https://{0}.table.core.windows.net", storageaccountName)), _defaultAzureCredentialProvider.GetDefaultAzureCredential());
+            _tableServiceClient = new TableServiceClient(new Uri(string.Format("https://{0}.table.core.windows.net", storageaccountName)), _defaultAzureCredentialProvider.GetDefaultAzureCredential(userAssignedClientId));
         }
 
         public async Task<ITable> CreateTable(string tableName)

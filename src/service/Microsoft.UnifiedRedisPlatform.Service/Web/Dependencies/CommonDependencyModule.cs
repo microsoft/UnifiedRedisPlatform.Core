@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using System.Linq;
 using Autofac.Core;
-using CQRS.Mediatr.Lite;
+using Microsoft.CQRS;
 using Microsoft.AzureRegion;
 using System.Collections.Generic;
 using Microsoft.UnifiedPlatform.Storage;
@@ -156,10 +156,6 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
                 (pi, ctx) => pi.Name.ToLowerInvariant() == "secretConfigurationProvider".ToLowerInvariant(),
                 (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(SecretsConfigurationProviderKey)));
 
-            builder.RegisterType<DefaultAzureCredentialProvider>()
-                  .As<IDefaultAzureCredentialProvider>()
-                  .SingleInstance();
-
             builder.Register(ctx =>
             {
                 var storageConfigResolver = ctx.Resolve<IConfigurationResolver<StorageConfiguration>>();
@@ -244,6 +240,12 @@ namespace Microsoft.UnifiedRedisPlatform.Service.Dependencies.DependencyResoluti
         {
             builder.RegisterType<RedisConnectionManger>()
                 .As<IRedisConnectionManager>()
+                .WithParameter(new ResolvedParameter(
+                    (pi, ctx) => pi.Name == "managedIdentityClientId",
+                    (pi, ctx) => ctx.ResolveKeyed<BaseConfigurationProvider>(AppSettingsConfigurationProviderKey).GetConfiguration("Authentication", "UserAssignedClientId").Result))
+                .WithParameter(new ResolvedParameter(
+                    (pi, ctx) => pi.Name == "logger",
+                    (pi, ctx) => ctx.ResolveOptional<AppInsights.EnterpriseTelemetry.ILogger>()))
                 .SingleInstance();
 
             builder.RegisterType<RedisStream>()

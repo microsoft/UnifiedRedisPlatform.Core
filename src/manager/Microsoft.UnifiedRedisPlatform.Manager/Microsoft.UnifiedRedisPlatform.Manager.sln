@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UnifiedPlatform.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UnifiedPlatform.Service.Common", "..\..\service\Microsoft.UnifiedRedisPlatform.Service\SharedKernel\Common\Microsoft.UnifiedPlatform.Service.Common.csproj", "{0C33A24D-5FE5-4566-9104-0F43E67FA798}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UnifiedRedisPlatform.Core", "..\..\sdk\Microsoft.UnifiedRedisPlatform.SDK\Core\Microsoft.UnifiedRedisPlatform.Core.csproj", "{C45F1E14-800A-47C6-8E6D-3FB82A3AA743}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UnifiedRedisPlatform.Core", "..\..\sdk\Core\Microsoft.UnifiedRedisPlatform.Core.csproj", "{C45F1E14-800A-47C6-8E6D-3FB82A3AA743}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UnifiedPlatform.Storage", "..\..\service\Microsoft.UnifiedRedisPlatform.Service\Infrastructure\Storage\Microsoft.UnifiedPlatform.Storage.csproj", "{57DE9E2F-18B7-41F7-9435-FD9A0A446E05}"
 EndProject

@@ -11,6 +11,6 @@ namespace Microsoft.UnifiedPlatform.Service.Common.Configuration
         Task<ClusterConfigurationDto> GetClusterDetails(string clusterName);
         Task<AppConfigurationDto> GetApplicationDetails(string clusterName, string appName);
         Task<string> GetApplicationSecret(string clusterName, string appName);
-        Task<List<ConnectionStringDto>> GetClusterConnectionStrings(string clusterName, string appName);
+        Task<List<ConnectionStringDto>> GetClusterConnectionStrings(string clusterName, string appName, bool useManagedIdentity = false);
     }
 }

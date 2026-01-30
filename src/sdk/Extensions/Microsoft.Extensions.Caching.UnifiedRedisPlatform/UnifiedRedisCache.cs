@@ -30,12 +30,13 @@ namespace Microsoft.Extensions.Caching.UnifiedRedisPlatform
             }
 
             if (string.IsNullOrWhiteSpace(options.Cluster)
-                || string.IsNullOrWhiteSpace(options.Application)
-                || string.IsNullOrWhiteSpace(options.AppSecret))
+                || string.IsNullOrWhiteSpace(options.Application))
                 throw new ArgumentNullException("Either ConfigurationOptions or Cluster-App details must be provided");
 
+            string serviceEndpoint = !string.IsNullOrWhiteSpace(options.ServiceEndpoint) ? options.ServiceEndpoint : null;
             string preferredLocation = !string.IsNullOrWhiteSpace(options.PreferredLocation) ? options.PreferredLocation : null;
-            connectionMux = UnifiedConnectionMultiplexer.Connect(options.Cluster, options.Application, options.AppSecret, preferredLocation: preferredLocation);
+            string managedIdentityClientId = !string.IsNullOrWhiteSpace(options.ManagedIdentityClientId) ? options.ManagedIdentityClientId : null;
+            connectionMux = UnifiedConnectionMultiplexer.Connect(options.Cluster, options.Application, options.AppSecret, serviceEndpoint, preferredLocation, managedIdentityClientId);
             return connectionMux;
         }
 

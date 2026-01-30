@@ -18,6 +18,14 @@ namespace Microsoft.UnifiedPlatform.Service.Configuration
             _configurationProvider = configurationProvider;
         }
 
+        /// <summary>
+        /// Appends "-msi" suffix to connection string key when MI is enabled
+        /// </summary>
+        private string GetConnectionStringKey(string baseKey, bool useManagedIdentity)
+        {
+            return useManagedIdentity ? $"{baseKey}-msi" : baseKey;
+        }
+
         public async Task<List<ClusterConfigurationDto>> GetAllClusters()
         {
             try
@@ -91,14 +99,15 @@ namespace Microsoft.UnifiedPlatform.Service.Configuration
             }
         }
 
-        public async Task<List<ConnectionStringDto>> GetClusterConnectionStrings(string clusterName, string appName)
+        public async Task<List<ConnectionStringDto>> GetClusterConnectionStrings(string clusterName, string appName, bool useManagedIdentity = false)
         {
             var clusterDetails = await GetClusterDetails(clusterName);
             try
             {
                 if (clusterDetails.ConnectionStrings == null || !clusterDetails.ConnectionStrings.Any())
                 {
-                    var redisConnectionString = await _configurationProvider.GetConfiguration(clusterName, "Redis-ConnectionString");
+                    var connectionStringKey = GetConnectionStringKey("Redis-ConnectionString", useManagedIdentity);
+                    var redisConnectionString = await _configurationProvider.GetConfiguration(clusterName, connectionStringKey);
                     return new List<ConnectionStringDto>()
                     {
                         new ConnectionStringDto()
@@ -117,7 +126,8 @@ namespace Microsoft.UnifiedPlatform.Service.Configuration
                         var fetchConnectionStringTask = Task.Run(async () =>
                         {
                             var region = connectionStringConfig.Region?.Name;
-                            var connectionStringKey = string.IsNullOrWhiteSpace(region) ? connectionStringConfig.ConnectionStringLocation : $"Redis-ConnectionString-{region}";
+                            var baseKey = string.IsNullOrWhiteSpace(region) ? connectionStringConfig.ConnectionStringLocation : $"Redis-ConnectionString-{region}";
+                            var connectionStringKey = GetConnectionStringKey(baseKey, useManagedIdentity);
                             var connectionString = await _configurationProvider.GetConfiguration(clusterName, connectionStringKey);
                             var connectionStringDto = new ConnectionStringDto()
                             {
@@ -138,7 +148,8 @@ namespace Microsoft.UnifiedPlatform.Service.Configuration
             }
             catch (ConfigurationNotFoundException exception)
             {
-                throw new IncompleteConfigurationException(clusterName, appName, $"RedisConnectionString: {clusterName}-Redis-ConnectionString", exception);
+                var suffix = useManagedIdentity ? "-msi" : "";
+                throw new IncompleteConfigurationException(clusterName, appName, $"RedisConnectionString: {clusterName}-Redis-ConnectionString{suffix}", exception);
             }
         }
     }

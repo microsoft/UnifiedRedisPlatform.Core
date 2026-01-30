@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using CQRS.Mediatr.Lite;
+using Microsoft.CQRS;
 using Microsoft.AzureRegion;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace Microsoft.UnifiedPlatform.Service.Application.Queries.Handlers
             var applicationConfiguration = await _configurationProvider.GetApplicationDetails(request.ClusterName, request.AppName);
             clusterConfiguration.Applications = new List<AppConfigurationDto>() { applicationConfiguration };
 
-            var clusterConnectionStrings = await _configurationProvider.GetClusterConnectionStrings(request.ClusterName, request.AppName);
+            var clusterConnectionStrings = await _configurationProvider.GetClusterConnectionStrings(request.ClusterName, request.AppName, request.UseManagedIdentity);
             if (clusterConnectionStrings.Count == 1)
             {
                 clusterConfiguration.RedisConnectionString = clusterConnectionStrings.First().ConnectionString;

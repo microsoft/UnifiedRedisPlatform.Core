@@ -18,22 +18,24 @@ namespace Microsoft.UnifiedRedisPlatform.Core.Services
         private readonly string _appName;
         private readonly string _appSecret;
         private readonly string _preferredLocation;
+        private readonly bool _useManagedIdentity;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ICache _internalCache;
 
-        public UnifiedRedisPlatformServiceClient(string serviceEndpoint, string clusterName, string appName, string appSecret, string preferredLocation, IHttpClientFactory clientFactory, ICache internalCache)
+        public UnifiedRedisPlatformServiceClient(string serviceEndpoint, string clusterName, string appName, string appSecret, string preferredLocation, bool useManagedIdentity, IHttpClientFactory clientFactory, ICache internalCache)
         {
             _serviceEndpoint = serviceEndpoint;
             _clusterName = clusterName;
             _appName = appName;
             _appSecret = appSecret;
             _preferredLocation = preferredLocation;
+            _useManagedIdentity = useManagedIdentity;
             _httpClientFactory = clientFactory;
             _internalCache = internalCache;
         }
 
-        public UnifiedRedisPlatformServiceClient(string serviceEndpoint, string clusterName, string appName, string appSecret, string preferredLocation)
-            : this(serviceEndpoint, clusterName, appName, appSecret, preferredLocation, new HttpClientFactory(maxRetry: 10, backOffInterval: 2500), new InternalCache())
+        public UnifiedRedisPlatformServiceClient(string serviceEndpoint, string clusterName, string appName, string appSecret, string preferredLocation, bool useManagedIdentity = false)
+            : this(serviceEndpoint, clusterName, appName, appSecret, preferredLocation, useManagedIdentity, new HttpClientFactory(maxRetry: 10, backOffInterval: 2500), new InternalCache())
         { }
 
         public async Task<AuthTokenResponseModel> GetAuthToken()
@@ -91,6 +93,8 @@ namespace Microsoft.UnifiedRedisPlatform.Core.Services
             request.Headers.Add("Authorization", $"Bearer {authResult.Token}");
             if (!string.IsNullOrWhiteSpace(_preferredLocation))
                 request.Headers.Add("x-location", _preferredLocation);
+            if (_useManagedIdentity)
+                request.Headers.Add("x-use-managed-identity", "true");
 
             using (var response = await client.SendAsync(request).ConfigureAwait(false))
             {

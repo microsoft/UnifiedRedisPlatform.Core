@@ -1,8 +1,6 @@
-﻿using Microsoft.CQRS;
+﻿using System;
+using Microsoft.CQRS;
 using Microsoft.UnifiedPlatform.Service.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Queries
 {
@@ -10,7 +8,7 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Queries
     {
         public override string DisplayName => "Get Key Query";
 
-        private string _id;
+        private readonly string _id;
         public override string Id => _id;
 
         public string Cluster { get; set; }
@@ -28,15 +26,22 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.Domain.Queries
         public override bool Validate(out string ValidationErrorMessage)
         {
             ValidationErrorMessage = null;
-
             if (string.IsNullOrWhiteSpace(Cluster))
-                ValidationErrorMessage += "Cluster name cannot be empty.";
+            {
+                ValidationErrorMessage = "Cluster is not provided";
+                return false;
+            }
             if (string.IsNullOrWhiteSpace(Application))
-                ValidationErrorMessage += "Application name cannot be empty.";
+            {
+                ValidationErrorMessage = "Application is not provided";
+                return false;
+            }
             if (string.IsNullOrWhiteSpace(Key))
-                ValidationErrorMessage += "Key cannot be empty";
-
-            return string.IsNullOrWhiteSpace(ValidationErrorMessage);
+            {
+                ValidationErrorMessage = "Key is not provided";
+                return false;
+            }
+            return true;
         }
     }
 }

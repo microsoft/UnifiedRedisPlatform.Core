@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,16 +33,14 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.App
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(options =>
-                {
-                    Configuration.Bind("AzureAd", options);
-                    options.ResponseType = "code";
-                    options.SaveTokens = true;
-                    options.Scope.Add("user_impersonation");
-                    options.ClientId = "6f40053e-5319-40e5-a90b-6f714506d96d";
-                    options.ClientSecret = "KEY_VAULT";
-                    options.Resource = "6f40053e-5319-40e5-a90b-6f714506d96d";
-                });
+                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
+
+            services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+            {
+                options.ResponseType = "code";
+                options.SaveTokens = true;
+                options.Scope.Add("user_impersonation");
+            });
 
             services.AddHttpClient();
             services.AddScoped<TokenProvider>();
@@ -53,7 +51,7 @@ namespace Microsoft.UnifiedRedisPlatform.Manager.App
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
-            });
+            }).AddMicrosoftIdentityUI();
 
             
 
