@@ -9,6 +9,7 @@ using Microsoft.UnifiedRedisPlatform.Core.Services.Models;
 using Microsoft.UnifiedRedisPlatform.Core.Services.Interfaces;
 using Azure.Core;
 using Azure.Identity;
+using Microsoft.Azure.StackExchangeRedis;
 
 namespace Microsoft.UnifiedRedisPlatform.Core
 {
@@ -31,11 +32,11 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             _appSecret = appSecret;
             _managedIdentityClientId = managedIdentityClientId;
             _serviceEndpoint = !string.IsNullOrWhiteSpace(serviceEndpoint) ? serviceEndpoint : Constant.OperationApi.DefaultUrl;
-            
-            // Set MI flag BEFORE creating the service client
+
+            // Client decides whether to use MI based on managedIdentityClientId parameter
             _useManagedIdentity = !string.IsNullOrWhiteSpace(managedIdentityClientId);
             _urpClient = new UnifiedRedisPlatformServiceClient(_serviceEndpoint, _clusterName, _appName, _appSecret, preferredLocation, _useManagedIdentity);
-            
+
             if (_useManagedIdentity)
             {
                 _tokenCredential = CreateTokenCredential(managedIdentityClientId);
@@ -112,7 +113,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
             if (clusterPreferredConfiguration.AreSecondaryConnectionsPresent)
             {
                 currentConfiguration.SecondaryConfigurationsOptions = new List<ConfigurationOptions>(); // Secondary connections are added from settings
-                foreach(var secondaryConnection in clusterPreferredConfiguration.SecondaryRedisConnectionStrings)
+                foreach (var secondaryConnection in clusterPreferredConfiguration.SecondaryRedisConnectionStrings)
                 {
                     currentConfiguration.SecondaryConfigurationsOptions.Add(await CreateRedisConfigurationOptionAsync(secondaryConnection, applicationPreferredConfiguration, isSecondaryConnection: true));
                 }
@@ -146,10 +147,16 @@ namespace Microsoft.UnifiedRedisPlatform.Core
 
             options.AbortOnConnectFail = false;
             options.Ssl = true;
+            options.KeepAlive = 60;  // Send keep-alive every 60 seconds to prevent stale connections
 
-            // Use Managed Identity token for Redis authentication if configured
+            // Use Managed Identity for Redis authentication if configured
+            // ConfigureForAzureWithTokenCredentialAsync handles automatic token refresh
             // Otherwise, keep the password from the connection string (legacy behavior)
-            if (_useManagedIdentity)
+            if (_useManagedIdentity && _tokenCredential != null)
+            {
+                await options.ConfigureForAzureWithTokenCredentialAsync(_tokenCredential).ConfigureAwait(false);
+            }
+            else
             {
                 var token = await GetRedisAccessTokenAsync();
                 options.Password = token;
@@ -195,12 +202,12 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                 existingConfiguration.ResolveDns = serverConfiguration.ResolveDns;
             }
 
-            // Use Managed Identity token for Redis authentication if configured
+            // Use Managed Identity for Redis authentication if configured
+            // ConfigureForAzureWithTokenCredentialAsync handles automatic token refresh
             // Otherwise, keep the password from the connection string (legacy behavior)
-            if (_useManagedIdentity)
+            if (_useManagedIdentity && _tokenCredential != null)
             {
-                var token = await GetRedisAccessTokenAsync();
-                existingConfiguration.Password = token;
+                await existingConfiguration.ConfigureForAzureWithTokenCredentialAsync(_tokenCredential).ConfigureAwait(false);
             }
             else
             {
@@ -224,8 +231,9 @@ namespace Microsoft.UnifiedRedisPlatform.Core
 
             existingConfiguration.ConnectTimeout = applicationConfiguration.ConnectionPreference.ConnectionRetryProtocol.TimeoutInMs;
 
+            // Ensure keep-alive is set to prevent stale connections (default 60 seconds)
             existingConfiguration.KeepAlive =
-                existingConfiguration.KeepAlive >= 1 ? existingConfiguration.KeepAlive : serverConfiguration.KeepAlive;
+                existingConfiguration.KeepAlive >= 1 ? existingConfiguration.KeepAlive : (serverConfiguration.KeepAlive >= 1 ? serverConfiguration.KeepAlive : 60);
 
             existingConfiguration.Proxy =
                 existingConfiguration.Proxy != Proxy.None ? existingConfiguration.Proxy : serverConfiguration.Proxy;

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Microsoft.UnifiedRedisPlatform.Core</id>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
     <title>Microsoft.UnifiedRedisPlatform.Core</title>
     <authors>Pratik Bhattacharya</authors>
     <owners>Microsoft</owners>
@@ -10,6 +10,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Lighweight library to connect to a common Redis Cache from multiple applications</description>
     <releaseNotes>
+v1.6.0:
+- Package version update
+
 v1.5.0:
 - Added Managed Identity support for Manager API
 - Improved configuration handling for ManagedIdentityClientId
