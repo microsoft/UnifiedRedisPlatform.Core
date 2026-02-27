@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using Microsoft.UnifiedRedisPlatform.Core.Services.Interfaces;
 
 namespace Microsoft.UnifiedRedisPlatform.Core.Services
@@ -24,7 +25,10 @@ namespace Microsoft.UnifiedRedisPlatform.Core.Services
                 if (_serviceClient == null)
                 {
                     var retryHandler = new RetryHttpHandler(new HttpClientHandler(), _maxRetry, _backoffInterval);
-                    _serviceClient = new HttpClient(retryHandler);
+                    _serviceClient = new HttpClient(retryHandler)
+                    {
+                        Timeout = TimeSpan.FromSeconds(30)  // 30 second overall timeout for URP service calls
+                    };
                 }
             }
             return _serviceClient;

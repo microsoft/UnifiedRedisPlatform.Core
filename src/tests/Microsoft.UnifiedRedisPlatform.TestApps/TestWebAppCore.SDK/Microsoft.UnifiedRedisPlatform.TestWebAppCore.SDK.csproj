@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="DistributedCache.Extensions.UnifiedRedisPlatform" Version="1.0.2" />
+    <PackageReference Include="Microsoft.UnifiedRedisPlatform.Core" Version="1.6.0" />
   </ItemGroup>
 
 

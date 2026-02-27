@@ -33,7 +33,7 @@ namespace Microsoft.UnifiedRedisPlatform.Core
                 MaxRetryCount = 50,
                 MinBackoffIntervalInMs = 2000,
                 MaxBackoffIntervalInMs = 15000,
-                TimeoutInMs = 3000,
+                TimeoutInMs = 10000,  // 10 seconds - allows time for MI token acquisition
                 HardTimeoutEnabled = false
             };
         }

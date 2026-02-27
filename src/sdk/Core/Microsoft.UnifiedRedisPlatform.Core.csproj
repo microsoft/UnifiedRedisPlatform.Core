@@ -3,14 +3,18 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Pratik Bhattacharya</Authors>
     <Company>Microsoft</Company>
     <Product>Unified Redis Platform</Product>
     <Description>Lighweight library to connect to a common Redis Cache from multiple applications</Description>
     <PackageReleaseNotes>
-v1.3.0:
+v1.6.0:
+- Fixed: Managed Identity token refresh - now uses ConfigureForAzureWithTokenCredentialAsync for automatic token renewal
+- Improved: Default operation timeout increased from 3s to 10s to accommodate MI token acquisition
+- Improved: Added 60-second keep-alive to prevent stale connections
+- All MI authentication methods (ServerOptions, LocalOptions, Direct Connect) now work correctly
 - Added Managed Identity (MI) support for Azure Redis Cache authentication
 - Upgraded to Microsoft.Azure.StackExchangeRedis 3.2.1
 - Added ConnectAsync() method for async connection initialization
