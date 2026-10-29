@@ -10,11 +10,11 @@ jobs:
   build-code-sdk:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore src/sdk/Microsoft.UnifiedRedisPlatform.SDK.sln
     - name: Build
@@ -25,11 +25,11 @@ jobs:
   build-service:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore src/service/Microsoft.UnifiedRedisPlatform.Service/Microsoft.UnifiedRedisPlatform.Service.sln
     - name: Build
@@ -38,11 +38,11 @@ jobs:
   build-test-apps:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 10.0.x
     - name: Restore dependencies (TestConsoleCore.SDK)
       run: dotnet restore src/tests/Microsoft.UnifiedRedisPlatform.TestApps/TestConsoleCore.SDK/Microsoft.UnifiedRedisPlatform.TestConsoleCore.SDK.csproj
     - name: Build (TestConsoleCore.SDK)
